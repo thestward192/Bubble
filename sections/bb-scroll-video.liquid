@@ -9,13 +9,18 @@
   assign fcount = section.settings.frame_count | default: 60
   assign rw = section.settings.frame_ratio_w | default: 260
   assign rh = section.settings.frame_ratio_h | default: 464
-  assign bg_w = cols | times: 100
-  assign bg_h = rows | times: 100
+  # Built-in frames: 5 small WebP sheets in /assets (6x3 cells of 360x641).
+  # One huge sprite made Safari/macOS get a 9 MB PNG from the CDN and fail
+  # to paint it, so the default now ships pre-split sheets drawn on a canvas.
+  assign use_theme_frames = false
+  if sprite == blank
+    assign use_theme_frames = true
+    assign fcount = 84
+    assign rw = 360
+    assign rh = 641
+  endif
   assign btn_link = section.settings.button_link | default: routes.all_products_collection_url
   assign fade_b = section.settings.fade_bottom | default: 10
-  assign fade_solid = 100 | minus: fade_b
-  assign fade_half = fade_b | divided_by: 2.0
-  assign fade_mid_pos = 100 | minus: fade_half
 
   assign locked = false
   if section.settings.scroll_mode == 'locked'
@@ -34,6 +39,20 @@
     assign has_steps = true
   endif
 -%}
+
+{%- capture sheets_json -%}
+  {%- if use_theme_frames -%}
+    [
+    {%- for n in (1..5) -%}
+      {%- assign sheet_file = 'bb-bracelet-frames-' | append: n | append: '.webp' -%}
+      {%- if n == 5 -%}{%- assign sr = 2 -%}{%- assign sn = 12 -%}{%- else -%}{%- assign sr = 3 -%}{%- assign sn = 18 -%}{%- endif -%}
+      {"u":{{ sheet_file | asset_url | json }},"c":6,"r":{{ sr }},"n":{{ sn }}}{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+    ]
+  {%- else -%}
+    [{"u":{{ sprite | json }},"c":{{ cols }},"r":{{ rows }},"n":{{ fcount }}}]
+  {%- endif -%}
+{%- endcapture -%}
 
 {% style %}
   #shopify-section-{{ section.id }} {
@@ -82,19 +101,15 @@
       rotateX(1deg);
     transition: transform 0.12s linear;
     will-change: transform;
-    -webkit-mask-image: linear-gradient(to bottom, #000 {{ fade_solid }}%, rgba(0,0,0,0.55) {{ fade_mid_pos }}%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 {{ fade_solid }}%, rgba(0,0,0,0.55) {{ fade_mid_pos }}%, transparent 100%);
   }
-  #shopify-section-{{ section.id }} .bb-svid__sprite {
+  #shopify-section-{{ section.id }} .bb-svid__canvas {
     display: block;
     position: absolute;
-    inset: 0;
-    background-repeat: no-repeat;
-    background-size: {{ bg_w }}% {{ bg_h }}%;
-    background-position: var(--bb-svid-x, 0%) var(--bb-svid-y, 0%);
-    {% if sprite != blank %}background-image: url("{{ sprite }}");{% endif %}
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
   }
-  #shopify-section-{{ section.id }} .bb-svid__sprite--b { opacity: 0; }
 
   #shopify-section-{{ section.id }} .bb-svid__eyebrow {
     position: absolute;
@@ -199,10 +214,10 @@
     #shopify-section-{{ section.id }} .bb-svid__copy .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.64 | round }}px; }
     #shopify-section-{{ section.id }} .bb-svid__steps { min-height: 11em; }
   }
+  /* The clip only moves while the visitor scrolls, so it stays on with
+     "Reduce motion" (common on Macs) — just without the 3D tilt. */
   @media (prefers-reduced-motion: reduce) {
-    #shopify-section-{{ section.id }} .bb-svid__track { height: auto; }
-    #shopify-section-{{ section.id }} .bb-svid__inner { position: static; min-height: 0; padding: clamp(32px, 6vh, 64px) 0; }
-    #shopify-section-{{ section.id }} .bb-svid__frame { transform: none; }
+    #shopify-section-{{ section.id }} .bb-svid__frame { transform: none; transition: none; }
     #shopify-section-{{ section.id }} .bb-svid__step { transition: none; }
   }
 {% endstyle %}
@@ -214,7 +229,9 @@
   data-bb-rows="{{ rows }}"
   data-bb-breaks="{{ section.settings.step_breaks | strip }}"
   data-bb-mode="{% if locked %}locked{% else %}scrub{% endif %}"
-  data-bb-seg-ms="{{ seg_ms }}">
+  data-bb-seg-ms="{{ seg_ms }}"
+  data-bb-sheets="{{ sheets_json | strip | escape }}"
+  data-bb-fade="{{ fade_b }}">
   <div class="bb-svid__track">
     <div class="bb-svid__inner">
       <div class="bb-svid__blob bb-svid__blob--1" aria-hidden="true"></div>
@@ -224,8 +241,7 @@
 
         <div class="bb-svid__stage">
           <div class="bb-svid__frame">
-            <div class="bb-svid__sprite bb-svid__sprite--a" aria-hidden="true"></div>
-            <div class="bb-svid__sprite bb-svid__sprite--b" aria-hidden="true"></div>
+            <canvas class="bb-svid__canvas" aria-hidden="true"></canvas>
           </div>
         </div>
 
@@ -275,15 +291,14 @@
 
     var track = section.querySelector('.bb-svid__track');
     var frame = section.querySelector('.bb-svid__frame');
-    var layerA = section.querySelector('.bb-svid__sprite--a');
-    var layerB = section.querySelector('.bb-svid__sprite--b');
+    var canvas = section.querySelector('.bb-svid__canvas');
+    var ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
     var steps = section.querySelectorAll('.bb-svid__step');
     if (!track || !frame) return;
 
     var FC = Math.max(1, parseInt(section.dataset.bbFrames, 10) || 60);
-    var COLS = Math.max(1, parseInt(section.dataset.bbCols, 10) || 10);
-    var ROWS = Math.max(1, parseInt(section.dataset.bbRows, 10) || 6);
     var NS = steps.length || 1;
+    var FADE = Math.max(0, Math.min(100, parseFloat(section.dataset.bbFade) || 0)) / 100;
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     var breaks = (section.dataset.bbBreaks || '').split(',')
@@ -300,29 +315,91 @@
       return Math.max(0, Math.min(NS - 1, Math.floor(p * NS)));
     }
 
-    function cellPos(i) {
-      var c = i % COLS;
-      var r = (i - c) / COLS;
-      return {
-        x: COLS > 1 ? (c / (COLS - 1)) * 100 : 0,
-        y: ROWS > 1 ? (r / (ROWS - 1)) * 100 : 0
-      };
+    /* ---- frame sheets: frame index -> { sheet, cell } ---- */
+    var sheets = [];
+    try { sheets = JSON.parse(section.dataset.bbSheets || '[]'); } catch (e) { sheets = []; }
+    var frameMap = [];
+    sheets.forEach(function (sh, si) {
+      sh.img = null;
+      for (var k = 0; k < sh.n && frameMap.length < FC; k++) frameMap.push({ s: si, k: k });
+    });
+    FC = Math.max(1, Math.min(FC, frameMap.length || FC));
+
+    function loaded(fi) {
+      var m = frameMap[fi];
+      return m && sheets[m.s].img ? m : null;
     }
-    function setLayer(el, i) {
-      if (!el) return;
-      var p = cellPos(i);
-      el.style.setProperty('--bb-svid-x', p.x + '%');
-      el.style.setProperty('--bb-svid-y', p.y + '%');
+    // nearest frame whose sheet has arrived, so something shows while the rest load
+    function nearestLoaded(fi) {
+      for (var d = 0; d < FC; d++) {
+        if (loaded(fi - d)) return fi - d;
+        if (loaded(fi + d)) return fi + d;
+      }
+      return -1;
     }
 
+    var cw = 0, ch = 0;
+    function sizeCanvas() {
+      if (!canvas) return;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var w = Math.round(frame.clientWidth * dpr);
+      var h = Math.round(frame.clientHeight * dpr);
+      if (w > 0 && h > 0 && (w !== cw || h !== ch)) {
+        cw = canvas.width = w;
+        ch = canvas.height = h;
+        drawn = '';
+      }
+    }
+
+    function drawCell(fi, alpha) {
+      var m = frameMap[fi];
+      var sh = sheets[m.s];
+      var fw = sh.img.naturalWidth / sh.c;
+      var fh = sh.img.naturalHeight / sh.r;
+      var c = m.k % sh.c;
+      var r = (m.k - c) / sh.c;
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(sh.img, c * fw, r * fh, fw, fh, 0, 0, cw, ch);
+    }
+
+    var drawn = '';
+    function drawFrame(i, next, local) {
+      if (!ctx) return;
+      sizeCanvas();
+      if (!cw || !ch) return;
+      var a = loaded(i) ? i : nearestLoaded(i);
+      if (a < 0) return;
+      var b = (a === i && next !== i && loaded(next) && local > 0.01) ? next : -1;
+      var key = a + ':' + b + ':' + (b < 0 ? 0 : local.toFixed(2));
+      if (key === drawn) return;
+      drawn = key;
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.clearRect(0, 0, cw, ch);
+      drawCell(a, 1);
+      if (b >= 0) drawCell(b, local);
+      if (FADE > 0) {
+        // soften the hard cut at the forearm (was a CSS mask; Safari is flaky with masks on 3D layers)
+        var g = ctx.createLinearGradient(0, 0, 0, ch);
+        g.addColorStop(0, 'rgba(0,0,0,1)');
+        g.addColorStop(1 - FADE, 'rgba(0,0,0,1)');
+        g.addColorStop(1 - FADE / 2, 'rgba(0,0,0,0.55)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, cw, ch);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+
+    var lastP = 0;
     function paint(progress) {
+      lastP = progress;
       var scaled = progress * (FC - 1);
       var i = Math.max(0, Math.min(FC - 1, Math.floor(scaled)));
       var next = Math.min(FC - 1, i + 1);
       var local = scaled - i;
-      setLayer(layerA, i);
-      setLayer(layerB, next);
-      if (layerB) layerB.style.opacity = local;
+      drawFrame(i, next, local);
       section.style.setProperty('--bb-svid-progress', progress.toFixed(4));
 
       var si = stepIndex(progress);
@@ -345,14 +422,25 @@
       steps[0].classList.add('is-active');
     }
 
-    var spriteUrl = getComputedStyle(layerA).backgroundImage.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+    // First sheet first (the opening frames), then the rest in parallel.
+    // cb runs once the first sheet is in; every later sheet repaints the current frame.
     function preloadSprite(cb) {
-      if (spriteUrl && spriteUrl !== 'none') {
-        var pre = new Image();
-        pre.onload = cb;
-        pre.onerror = cb;
-        pre.src = spriteUrl;
-      } else { cb(); }
+      if (!sheets.length) { cb(); return; }
+      function load(sh, done) {
+        var img = new Image();
+        img.decoding = 'async';
+        img.onload = function () { sh.img = img; drawn = ''; done(); };
+        img.onerror = done;
+        img.src = sh.u;
+      }
+      load(sheets[0], function () {
+        cb();
+        for (var s = 1; s < sheets.length; s++) load(sheets[s], function () { paint(lastP); });
+      });
+    }
+
+    if (window.ResizeObserver) {
+      new ResizeObserver(function () { sizeCanvas(); paint(lastP); }).observe(frame);
     }
 
     var mode = section.dataset.bbMode || 'scrub';
@@ -362,10 +450,17 @@
       var shownP = currentProgress();
       var targetP = shownP;
       var smoothing = false;
-      paint(reduce ? 0 : shownP);
-      if (reduce) return;
+      var lastTick = 0;
+      paint(shownP);
 
-      function smoothTick() {
+      function smoothTick(now) {
+        if (reduce) {
+          // no easing: frame follows the scroll bar exactly
+          shownP = targetP;
+          paint(shownP);
+          smoothing = false;
+          return;
+        }
         var diff = targetP - shownP;
         if (Math.abs(diff) < 0.0006) {
           shownP = targetP;
@@ -373,13 +468,17 @@
           smoothing = false;
           return;
         }
-        shownP += diff * 0.16;
+        // time-based easing (16% per 60fps frame) so slower or 30fps
+        // devices (Safari Low Power Mode) don't lag behind the scroll
+        var dt = lastTick ? Math.min(100, now - lastTick) : 16.7;
+        lastTick = now;
+        shownP += diff * (1 - Math.pow(0.84, dt / 16.7));
         paint(shownP);
         requestAnimationFrame(smoothTick);
       }
       function onScroll() {
         targetP = currentProgress();
-        if (!smoothing) { smoothing = true; requestAnimationFrame(smoothTick); }
+        if (!smoothing) { smoothing = true; lastTick = 0; requestAnimationFrame(smoothTick); }
       }
 
       /* Only listen to scroll while the track is anywhere near the viewport —
@@ -594,7 +693,7 @@
   "tag": "section",
   "settings": [
     { "type": "paragraph", "content": "A cut-out clip that plays frame by frame as the visitor scrolls, pinned in the centre. Three short texts fade in around it — top-left, then right, then bottom-left." },
-    { "type": "text", "id": "sprite_url", "label": "Frames image URL (sprite sheet)", "default": "https://cdn.shopify.com/s/files/1/0771/1565/4198/files/bb-bracelet-sprite-full.webp" },
+    { "type": "text", "id": "sprite_url", "label": "Custom frames image URL (sprite sheet)", "info": "Leave empty to use the built-in bracelet clip (recommended — it is split into small files that work on Safari / Mac, iPhone and iPad). The settings below only apply to a custom sprite." },
     { "type": "number", "id": "frame_count", "label": "Number of frames", "default": 84 },
     { "type": "range", "id": "sprite_cols", "label": "Sprite columns", "min": 1, "max": 20, "step": 1, "default": 12 },
     { "type": "range", "id": "sprite_rows", "label": "Sprite rows", "min": 1, "max": 20, "step": 1, "default": 7 },
