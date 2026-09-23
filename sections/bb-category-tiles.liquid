@@ -1,6 +1,18 @@
 {{ 'bb-styles.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
 
+{%- liquid
+  assign bb_tile_count = section.blocks.size
+  assign bb_tablet_cols = 3
+  assign bb_mobile_cols = 3
+  if bb_tile_count == 4
+    assign bb_tablet_cols = 4
+    assign bb_mobile_cols = 2
+  elsif bb_tile_count == 2
+    assign bb_mobile_cols = 2
+  endif
+-%}
+
 {% style %}
   #shopify-section-{{ section.id }} {
     padding-top: {{ section.settings.padding_top }}px;
@@ -16,13 +28,13 @@
   #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size }}px; }
   #shopify-section-{{ section.id }} .bb-cat__name { font-size: {{ section.settings.label_size }}px; }
   @media (max-width: 1100px) {
-    #shopify-section-{{ section.id }} .bb-cats__grid { grid-template-columns: repeat(3, minmax(0, 190px)); }
+    #shopify-section-{{ section.id }} .bb-cats__grid { grid-template-columns: repeat({{ bb_tablet_cols }}, minmax(0, 190px)); }
   }
   @media (max-width: 700px) {
     #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.78 | round }}px; }
   }
   @media (max-width: 640px) {
-    #shopify-section-{{ section.id }} .bb-cats__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 10px; }
+    #shopify-section-{{ section.id }} .bb-cats__grid { grid-template-columns: repeat({{ bb_mobile_cols }}, minmax(0, 1fr)); column-gap: 10px; }
     #shopify-section-{{ section.id }} .bb-cat__name { font-size: {{ section.settings.label_size | times: 0.78 | round }}px; }
     #shopify-section-{{ section.id }} .bb-cats__eyebrow { display: none; }
   }

@@ -113,12 +113,21 @@
             "caption": "Haircare",
             "link": "/collections/all?filter.p.product_type=Hair%20Accessories"
           }
+        },
+        "t4": {
+          "type": "tile",
+          "settings": {
+            "label": "Nailed It",
+            "caption": "Press-On Nails",
+            "link": "/collections/all?filter.p.product_type=Press-On%20Nails"
+          }
         }
       },
       "block_order": [
         "t1",
         "t2",
-        "t3"
+        "t3",
+        "t4"
       ],
       "settings": {
         "eyebrow": "Categories",
@@ -126,7 +135,7 @@
         "heading_size": 32,
         "view_all_label": "View All Categories",
         "view_all_link": "/collections/all",
-        "columns": 3,
+        "columns": 4,
         "label_size": 17,
         "bg_color": "#ffffff",
         "padding_top": 56,
