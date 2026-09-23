@@ -164,7 +164,7 @@
         "s3"
       ],
       "settings": {
-        "sprite_url": "https://cdn.shopify.com/s/files/1/0771/1565/4198/files/bb-bracelet-sprite-full.webp",
+        "sprite_url": "",
         "frame_count": 84,
         "sprite_cols": 12,
         "sprite_rows": 7,
