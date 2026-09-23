@@ -25,7 +25,7 @@
   }
 {%- endstyle -%}
 
-<div class="bb-shop-grid color-{{ section.settings.color_scheme }}">
+<div class="bb-shop-grid color-{{ section.settings.color_scheme }}"{% if section.settings.enable_sparkles %} data-bb-sparkles="{{ section.settings.sparkle_amount }}"{% endif %}>
   {%- paginate collection.products by section.settings.products_per_page -%}
     <div class="bb-shop-grid__layout">
       {%- if section.settings.enable_filtering or section.settings.enable_sorting -%}
@@ -159,8 +159,9 @@
       "label": "Productos por página",
       "min": 8,
       "max": 36,
-      "step": 4,
-      "default": 16
+      "step": 1,
+      "default": 15,
+      "info": "15 con 4 columnas = 3 filas completas y una última fila de 3."
     },
     {
       "type": "range",
@@ -181,6 +182,25 @@
         { "value": "2", "label": "2" }
       ],
       "default": "2"
+    },
+    { "type": "header", "content": "Destellos" },
+    {
+      "type": "checkbox",
+      "id": "enable_sparkles",
+      "label": "Mostrar destellos",
+      "info": "Pequeños brillos dorados que aparecen al azar sobre los productos y el banner. Se desactivan solos si el visitante tiene \"reducir movimiento\" activado.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "sparkle_amount",
+      "label": "Cantidad de destellos",
+      "options": [
+        { "value": "low", "label": "Pocos" },
+        { "value": "medium", "label": "Normal" },
+        { "value": "high", "label": "Muchos" }
+      ],
+      "default": "medium"
     },
     {
       "type": "color_scheme",

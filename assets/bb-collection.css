@@ -959,3 +959,74 @@ html.bb-filter-lock body {
     text-overflow: ellipsis;
   }
 }
+
+/* ------------------------------------------------------------- SPARKLES */
+/* Light glints on the collection page (bb-collection.js spawns them).
+   A glint = two long thin crossed rays + two short diagonal rays + a white
+   core with a warm gold halo, popping in and out with a small twist. */
+.bb-shop-grid[data-bb-sparkles],
+.bb-shop-hero__banner {
+  position: relative;
+}
+.bb-sparkle-layer {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bb-spark {
+  /* --s = full ray span; a small warm-gold core with a faint bloom and
+     hair-thin gold rays — delicate rather than a bright white flash */
+  --s: 70px;
+  --d: 1.8s;
+  --r: 0deg;
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 246, 214, 1) 0 2%, rgba(247, 214, 128, 0.95) 3.5%, rgba(222, 170, 62, 0.35) 8%, rgba(222, 170, 62, 0.1) 14%, rgba(222, 170, 62, 0) 22%);
+  filter: drop-shadow(0 0 calc(var(--s) * 0.03) rgba(214, 160, 50, 0.75));
+  opacity: 0;
+  transform: scale(0) rotate(var(--r));
+  animation: bb-spark var(--d) cubic-bezier(0.3, 0, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+.bb-spark::before,
+.bb-spark::after,
+.bb-spark i {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: max(1px, calc(var(--s) * 0.016));
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(214, 160, 50, 0) 0%, rgba(214, 160, 50, 0.35) 18%, rgba(232, 188, 88, 0.85) 38%, rgba(252, 226, 160, 1) 50%, rgba(232, 188, 88, 0.85) 62%, rgba(214, 160, 50, 0.35) 82%, rgba(214, 160, 50, 0) 100%);
+  transform: translate(-50%, -50%);
+}
+.bb-spark::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+/* short diagonal rays (two <i> children) */
+.bb-spark i {
+  width: 38%;
+  height: max(1px, calc(var(--s) * 0.011));
+  opacity: 0.7;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.bb-spark i + i {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+@keyframes bb-spark {
+  0%   { opacity: 0; transform: scale(0) rotate(var(--r)); }
+  40%  { opacity: 1; transform: scale(1) rotate(calc(var(--r) + 30deg)); }
+  55%  { opacity: 0.85; transform: scale(0.82) rotate(calc(var(--r) + 42deg)); }
+  70%  { opacity: 1; transform: scale(0.95) rotate(calc(var(--r) + 55deg)); }
+  100% { opacity: 0; transform: scale(0) rotate(calc(var(--r) + 90deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bb-sparkle-layer { display: none; }
+}
