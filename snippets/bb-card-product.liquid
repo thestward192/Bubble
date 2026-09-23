@@ -106,7 +106,7 @@
         {%- endif -%}
       </div>
 
-      {%- if card_product.available -%}
+      {%- if card_product.available and card_product.has_only_default_variant -%}
         <product-form class="bb-pcard__add-wrap">
           {%- form 'product', card_product, novalidate: 'novalidate' -%}
             <input
@@ -114,20 +114,23 @@
               name="id"
               value="{{ card_product.selected_or_first_available_variant.id }}"
             >
-            {%- if card_product.has_only_default_variant -%}
-              <button type="submit" name="add" class="bb-pcard__add">
-                <span>{{ 'sections.bb_card.add_to_cart' | t }}</span>
-                {%- render 'loading-spinner' -%}
-              </button>
-            {%- else -%}
-              <a href="{{ card_product.url }}" class="bb-pcard__add">
-                {{ 'sections.bb_card.choose_options' | t }}
-              </a>
-            {%- endif -%}
+            <button type="submit" name="add" class="bb-pcard__add">
+              <span>{{ 'sections.bb_card.add_to_cart' | t }}</span>
+              {%- render 'loading-spinner' -%}
+            </button>
           {%- endform -%}
         </product-form>
+      {%- elsif card_product.available -%}
+        {%- comment -%} No <product-form> here: it expects a submit button and throws without one {%- endcomment -%}
+        <div class="bb-pcard__add-wrap">
+          <a href="{{ card_product.url }}" class="bb-pcard__add">
+            {{ 'sections.bb_card.choose_options' | t }}
+          </a>
+        </div>
       {%- else -%}
-        <span class="bb-pcard__add bb-pcard__add--soldout">{{ 'sections.bb_card.sold_out' | t }}</span>
+        <div class="bb-pcard__add-wrap">
+          <span class="bb-pcard__add bb-pcard__add--soldout">{{ 'sections.bb_card.sold_out' | t }}</span>
+        </div>
       {%- endif -%}
     </div>
   </div>

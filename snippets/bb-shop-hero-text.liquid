@@ -1,0 +1,21 @@
+{% comment %}
+  Breadcrumb + title + description for bb-collection-hero.
+  Accepts: show_breadcrumb, show_description (Boolean), fallback (String)
+{% endcomment %}
+<div class="bb-shop-hero__text">
+  {%- if show_breadcrumb -%}
+    <div class="bb-shop-crumb">
+      <a href="{{ routes.root_url }}">{{ 'sections.bb_collection_hero.home' | t }}</a>
+      <span aria-hidden="true">/</span>
+      {{ collection.title | escape }}
+    </div>
+  {%- endif -%}
+
+  <h1 class="bb-shop-hero__title">{{ collection.title | escape }}</h1>
+
+  {%- if show_description and collection.description != blank -%}
+    <div class="bb-shop-hero__desc rte">{{ collection.description }}</div>
+  {%- elsif fallback != blank -%}
+    <div class="bb-shop-hero__desc rte">{{ fallback }}</div>
+  {%- endif -%}
+</div>

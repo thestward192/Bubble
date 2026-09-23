@@ -99,3 +99,50 @@
     }
   });
 })();
+
+/* Filter drawer: [data-bb-filter-open] slides the vertical filter form in
+   from the right. Delegated listeners, so it survives facets.js re-renders
+   and theme-editor section reloads. Filters still apply live on change;
+   the drawer's button only closes it. */
+(function () {
+  if (window.__bbFilterDrawer) return;
+  window.__bbFilterDrawer = true;
+
+  var lastTrigger = null;
+
+  function openDrawer(drawer, trigger) {
+    lastTrigger = trigger || null;
+    drawer.classList.add('is-open');
+    document.documentElement.classList.add('bb-filter-lock');
+    if (trigger) trigger.setAttribute('aria-expanded', 'true');
+    var panel = drawer.querySelector('.bb-filter-drawer__panel');
+    if (panel) window.setTimeout(function () { panel.focus({ preventScroll: true }); }, 50);
+  }
+
+  function closeDrawer(drawer) {
+    if (!drawer || !drawer.classList.contains('is-open')) return;
+    drawer.classList.remove('is-open');
+    document.documentElement.classList.remove('bb-filter-lock');
+    document.querySelectorAll('[data-bb-filter-open]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+    if (lastTrigger && document.contains(lastTrigger)) lastTrigger.focus({ preventScroll: true });
+    lastTrigger = null;
+  }
+
+  document.addEventListener('click', function (e) {
+    var opener = e.target.closest('[data-bb-filter-open]');
+    if (opener) {
+      var drawer = document.getElementById(opener.getAttribute('aria-controls'));
+      if (drawer) { e.preventDefault(); openDrawer(drawer, opener); }
+      return;
+    }
+    var closer = e.target.closest('[data-bb-filter-close]');
+    if (closer) {
+      e.preventDefault();
+      closeDrawer(closer.closest('[data-bb-filter-drawer]'));
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeDrawer(document.querySelector('[data-bb-filter-drawer].is-open'));
+  });
+})();

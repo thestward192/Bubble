@@ -73,38 +73,247 @@
   margin: 0;
 }
 
+/* Wide, short banner, edge to edge — the title sits on the plain left
+   side of the photo. Kept low so products show on first load. */
+.bb-shop-hero__banner {
+  position: relative;
+  height: var(--bb-banner-h, 240px);
+  overflow: hidden;
+  background: #efe3f3;
+}
+.bb-shop-hero__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--bb-banner-pos, 70% center);
+}
+.bb-shop-hero__overlay {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.bb-shop-hero--banner .bb-shop-hero__title {
+  margin-bottom: 6px;
+}
+.bb-shop-hero--banner .bb-shop-hero__desc {
+  max-width: 440px;
+  font-size: 15px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.bb-shop-hero--banner .bb-shop-crumb {
+  margin-bottom: 12px;
+  color: rgba(42, 26, 56, 0.55);
+}
+.bb-shop-hero--banner .bb-shop-crumb a {
+  color: rgba(42, 26, 56, 0.55);
+}
+@media screen and (max-width: 749px) {
+  /* narrow screens: the jewelry can slide under the text, so fade the
+     left side into the photo's own pink to keep the title readable */
+  .bb-shop-hero__banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(90deg, rgba(238, 226, 243, 0.92) 0%, rgba(238, 226, 243, 0.6) 45%, rgba(238, 226, 243, 0) 75%);
+    pointer-events: none;
+  }
+  .bb-shop-hero__overlay { z-index: 2; }
+  .bb-shop-hero--banner .bb-shop-hero__title { font-size: 30px; margin-bottom: 2px; }
+  .bb-shop-hero--banner .bb-shop-crumb { margin-bottom: 8px; }
+  .bb-shop-hero--banner .bb-shop-hero__desc { font-size: 13.5px; max-width: 70%; }
+}
+
 /* ------------------------------------------------------------- LAYOUT */
 .bb-shop-grid__layout {
   max-width: var(--bbc-maxw);
   margin: 0 auto;
   padding: 0 var(--bbc-gutter);
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 56px;
-  align-items: start;
-}
-/* ----------------------------------------------------------- SIDEBAR */
-.bb-shop-grid__aside {
-  position: sticky;
-  top: 112px;
-  padding-top: 28px;
   font-family: var(--bbc-sans);
 }
-/* Mobile/tablet: stack the filters above the grid (order: -1) instead of
-   sticky-positioned beside it — this MUST come after the base rule above,
-   since a media query does not out-rank a later plain rule of the same
-   specificity; putting it earlier let "position: sticky" win at every
-   width and made the filter bar float on top of the product cards. */
-@media screen and (max-width: 989px) {
-  .bb-shop-grid__layout {
-    grid-template-columns: 1fr;
-  }
-  .bb-shop-grid__aside {
-    order: -1;
-    position: static;
-    padding-top: 0;
-  }
+
+/* ---------------------------------------------------------- TOOLBAR */
+/* [Filter] [27 products] ............ Sort by [A-Z] */
+.bb-shop-grid__toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 20px;
+  padding-bottom: 18px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--bbc-line);
 }
+.bb-shop-grid__toolbar--nofilter {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.bb-filter-toggle {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 22px;
+  border: 1px solid var(--bbc-line);
+  border-radius: var(--bbc-pill);
+  background: #fff;
+  font: 500 13px/1 var(--bbc-sans);
+  color: var(--bbc-ink);
+  cursor: pointer;
+  transition: border-color 0.2s var(--bbc-ease), color 0.2s var(--bbc-ease);
+}
+.bb-filter-toggle:hover {
+  border-color: var(--bbc-primary);
+  color: var(--bbc-primary);
+}
+.bb-filter-toggle .svg-wrapper {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+.bb-filter-toggle svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ------------------------------------------------------ FILTER DRAWER */
+.bb-filter-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 0.4s;
+}
+.bb-filter-drawer.is-open {
+  visibility: visible;
+  pointer-events: auto;
+  transition: none;
+}
+.bb-filter-drawer .bb-filter-drawer__overlay {
+  display: block; /* it's an empty div: must out-rank Dawn's div:empty { display: none } */
+  position: absolute;
+  inset: 0;
+  background: rgba(42, 26, 56, 0.4);
+  opacity: 0;
+  transition: opacity 0.4s var(--bbc-ease);
+}
+.bb-filter-drawer.is-open .bb-filter-drawer__overlay {
+  opacity: 1;
+}
+.bb-filter-drawer__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(380px, 88vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--bbc-bg);
+  box-shadow: -18px 0 40px -24px rgba(42, 26, 56, 0.45);
+  transform: translateX(100%);
+  transition: transform 0.4s var(--bbc-ease);
+  outline: none;
+  font-family: var(--bbc-sans);
+}
+.bb-filter-drawer.is-open .bb-filter-drawer__panel {
+  transform: none;
+}
+.bb-filter-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--bbc-line);
+}
+.bb-filter-drawer__title {
+  margin: 0;
+  font: 400 24px/1.1 var(--bbc-serif);
+  color: var(--bbc-ink);
+}
+.bb-filter-drawer__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--bbc-ink);
+  cursor: pointer;
+}
+.bb-filter-drawer__close:hover {
+  background: #fff;
+}
+.bb-filter-drawer__close .svg-wrapper,
+.bb-filter-drawer__close svg {
+  width: 16px;
+  height: 16px;
+}
+.bb-filter-drawer__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 24px 24px;
+}
+.bb-filter-drawer__foot {
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--bbc-line);
+}
+.bb-filter-drawer__done {
+  width: 100%;
+  height: 46px;
+  border: 0;
+  border-radius: var(--bbc-pill);
+  background: var(--bbc-primary);
+  color: #fff;
+  font: 500 12px/1 var(--bbc-sans);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+html.bb-filter-lock,
+html.bb-filter-lock body {
+  overflow: hidden;
+}
+
+/* Inside the drawer only the vertical filter form (old sidebar design) is
+   used — at every width. Dawn's own mobile drawer, pills and count are
+   still rendered (facets.js needs them) but kept hidden. */
+.bb-filter-drawer .facets-container {
+  display: block;
+  padding: 0;
+}
+.bb-filter-drawer facet-filters-form.facets,
+.bb-filter-drawer facet-filters-form.facets.small-hide {
+  display: block !important;
+}
+.bb-filter-drawer .facets__form-vertical {
+  width: 100%;
+  display: block;
+}
+.bb-filter-drawer .mobile-facets__wrapper,
+.bb-filter-drawer .active-facets-mobile,
+.bb-filter-drawer .product-count {
+  display: none !important;
+}
+.bb-filter-drawer .active-facets-desktop {
+  margin-top: 16px;
+}
+/* the drawer head already says "Filter" */
+.bb-filter-drawer .facets__heading--vertical {
+  display: none;
+}
+/* ----------------------------------------------------------- FILTERS */
 .bb-shop-grid__aside .facets__heading,
 .bb-shop-grid__aside .facets__heading--vertical {
   font: 700 12px/1 var(--bbc-sans);
@@ -387,33 +596,15 @@
 }
 
 /* -------------------------------------------------------------- MAIN */
-.bb-shop-grid__toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 16px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--bbc-line);
-}
-.bb-shop-grid__toolbar form {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 16px;
-  flex-wrap: wrap;
-}
 .bb-shop-grid__count {
   margin: 0;
-  font: 500 14px/1 var(--bbc-sans);
-  color: var(--bbc-ink);
+  font: 500 13px/1.2 var(--bbc-sans);
+  color: var(--bbc-muted);
 }
 .bb-shop-grid__sort {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-  width: auto;
+  gap: 10px;
   font-size: 13px;
   color: var(--bbc-muted);
 }
@@ -421,15 +612,23 @@
   white-space: nowrap;
 }
 .bb-shop-grid__sort-select {
-  display: inline-block;
-  width: auto;
-  max-width: max-content;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  height: 42px;
+  max-width: 100%;
+  padding: 0 36px 0 18px;
   border: 1px solid var(--bbc-line);
   border-radius: var(--bbc-pill);
-  padding: 8px 32px 8px 14px;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%232E2743' stroke-width='1.6'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 11px 7px;
   font: 500 13px/1 var(--bbc-sans);
   color: var(--bbc-ink);
-  background: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -514,7 +713,7 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 0.5s var(--bb-ease, ease), transform 0.9s var(--bb-ease, ease);
+  transition: opacity 1s cubic-bezier(0.45, 0, 0.25, 1), transform 0.9s var(--bb-ease, ease);
 }
 .bb-pcard__dots {
   display: none;
@@ -697,93 +896,31 @@
     gap: 16px 12px;
   }
 
-  /* Toolbar: [Filter] [Sort] side by side, then active filters + one count.
-     The aside/main wrappers dissolve so their pieces share one grid. */
-  .bb-shop-grid__layout {
+  /* Toolbar on phones: [Filter] [Sort] as two equal pills, count below */
+  .bb-shop-grid__toolbar {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     column-gap: 10px;
-    row-gap: 0;
+    row-gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
   }
-  .bb-shop-grid__aside,
-  .bb-shop-grid__aside .facets-container,
-  .bb-shop-grid__main {
-    display: contents;
-  }
-  .bb-shop-grid__aside .mobile-facets__wrapper {
-    grid-column: 1;
-    grid-row: 1;
-    min-width: 0;
-  }
-  .bb-shop-grid__toolbar {
-    grid-column: 2;
-    grid-row: 1;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-  }
-  .bb-shop-grid__aside .active-facets-mobile {
+  .bb-shop-grid__toolbar .bb-shop-grid__count {
     grid-column: 1 / -1;
     grid-row: 2;
-    margin: 12px 0 0;
   }
-  .bb-shop-grid__aside .active-facets-mobile:empty { display: none; }
-  .bb-shop-grid__aside .product-count {
+  .bb-shop-grid__toolbar--nofilter .bb-shop-grid__sort-form {
     grid-column: 1 / -1;
-    grid-row: 3;
-    margin: 14px 0 0;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--bbc-line);
-    text-align: left;
   }
-  .bb-shop-grid__aside .product-count__text {
-    font: 500 13px/1.2 var(--bbc-sans);
-    color: var(--bbc-muted);
-  }
-  #ProductGridContainer {
-    grid-column: 1 / -1;
-    grid-row: 4;
-    min-width: 0;
-    margin-top: 20px;
-  }
-
-  /* same pill for both controls */
-  .bb-shop-grid__aside .mobile-facets__disclosure,
-  .bb-shop-grid__aside .mobile-facets__open-wrapper {
-    display: block;
+  .bb-filter-toggle {
     width: 100%;
-  }
-  .bb-shop-grid__aside .mobile-facets__open,
-  .bb-shop-grid__sort-select {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: none;
-    height: 42px;
-    border: 1px solid var(--bbc-line);
-    border-radius: var(--bbc-pill);
-    background-color: #fff;
-    font: 500 13px/1 var(--bbc-sans);
-    color: var(--bbc-ink);
-  }
-  .bb-shop-grid__aside .mobile-facets__open {
-    justify-content: center;
-    gap: 8px;
     padding: 0 14px;
   }
-  .bb-shop-grid__aside .mobile-facets__open .svg-wrapper {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-  }
-  .bb-shop-grid__aside .mobile-facets__open-label {
-    font: inherit;
-    text-decoration: none !important;
-  }
-  .bb-shop-grid__toolbar form { display: block; }
-  .bb-shop-grid__count { display: none; }
+  .bb-shop-grid__sort-form,
+  .bb-shop-grid__sort-form form,
   .bb-shop-grid__sort {
     display: block;
     width: 100%;
+    min-width: 0;
   }
   .bb-shop-grid__sort label {
     position: absolute;
@@ -794,17 +931,10 @@
     white-space: nowrap;
   }
   .bb-shop-grid__sort-select {
-    -webkit-appearance: none;
-    appearance: none;
+    width: 100%;
     padding: 0 30px 0 14px;
     font-size: 12px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%232E2743' stroke-width='1.6'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
     background-position: right 13px center;
-    background-size: 11px 7px;
   }
 
   /* compact card body on phones */
