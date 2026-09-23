@@ -24,10 +24,40 @@
       <div class="menu-drawer__inner-container">
         <div class="menu-drawer__navigation-container">
           <nav class="menu-drawer__navigation">
+            {%- liquid
+              # Auto collections dropdown: turns the menu's catalog link into a submenu listing every collection,
+              # or adds one as the 2nd item when the menu has no such link.
+              assign bb_coll_on = section.settings.bb_collections_menu
+              assign bb_coll_label = section.settings.bb_collections_label | default: 'Products'
+              assign bb_coll_in_menu = false
+              assign bb_coll_rendered = false
+              for l in section.settings.menu.links
+                if l.links == blank
+                  if l.url == routes.all_products_collection_url or l.url == routes.collections_url
+                    assign bb_coll_in_menu = true
+                  endif
+                endif
+              endfor
+            -%}
             <ul class="menu-drawer__menu has-submenu list-menu" role="list">
               {%- for link in section.settings.menu.links -%}
+                {%- if bb_coll_on and bb_coll_in_menu == false and bb_coll_rendered == false and forloop.index == 2 -%}
+                  <li>{% render 'bb-drawer-collections', label: bb_coll_label, index: 'bb' %}</li>
+                  {%- assign bb_coll_rendered = true -%}
+                {%- endif -%}
+                {%- liquid
+                  assign bb_is_coll = false
+                  if bb_coll_on and bb_coll_in_menu and bb_coll_rendered == false and link.links == blank
+                    if link.url == routes.all_products_collection_url or link.url == routes.collections_url
+                      assign bb_is_coll = true
+                    endif
+                  endif
+                -%}
                 <li>
-                  {%- if link.links != blank -%}
+                  {%- if bb_is_coll -%}
+                    {% render 'bb-drawer-collections', label: bb_coll_label, index: forloop.index %}
+                    {%- assign bb_coll_rendered = true -%}
+                  {%- elsif link.links != blank -%}
                     <details id="Details-menu-drawer-menu-item-{{ forloop.index }}">
                       <summary
                         id="HeaderDrawer-{{ link.handle }}"
@@ -137,6 +167,9 @@
                   {%- endif -%}
                 </li>
               {%- endfor -%}
+              {%- if bb_coll_on and bb_coll_rendered == false -%}
+                <li>{% render 'bb-drawer-collections', label: bb_coll_label, index: 'bb' %}</li>
+              {%- endif -%}
             </ul>
           </nav>
           <div class="menu-drawer__utility-links">

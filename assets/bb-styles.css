@@ -321,6 +321,64 @@ body {
   background: rgba(123, 94, 199, 0.10);
 }
 
+/* collections dropdown on the desktop nav */
+.bb-mainnav__item--dd { position: relative; }
+.bb-mainnav__item--dd > .bb-mainnav__link { display: inline-flex; align-items: center; gap: 5px; }
+.bb-mainnav__caret { transition: transform 0.25s var(--bb-ease); }
+.bb-mainnav__dd {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 30;
+  padding-top: 10px; /* invisible bridge so the panel doesn't close while moving the mouse down */
+  min-width: 240px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, 6px);
+  transition: opacity 0.2s var(--bb-ease), transform 0.2s var(--bb-ease), visibility 0.2s;
+}
+.bb-mainnav__item--dd:hover > .bb-mainnav__dd,
+.bb-mainnav__item--dd:focus-within > .bb-mainnav__dd {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+.bb-mainnav__item--dd:hover .bb-mainnav__caret,
+.bb-mainnav__item--dd:focus-within .bb-mainnav__caret { transform: rotate(180deg); }
+.bb-mainnav__item--dd:hover > .bb-mainnav__link { color: var(--bb-primary-deep); background: rgba(123, 94, 199, 0.10); }
+.bb-mainnav__ddlist {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--bb-line);
+  border-radius: 16px;
+  box-shadow: var(--bb-shadow);
+}
+.bb-mainnav__ddlink {
+  display: block;
+  padding: 9px 14px;
+  border-radius: 10px;
+  font: 500 14px/1.3 var(--bb-sans);
+  color: var(--bb-ink);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s var(--bb-ease), background-color 0.2s var(--bb-ease);
+}
+.bb-mainnav__ddlink:hover,
+.bb-mainnav__ddlink:focus-visible,
+.bb-mainnav__ddlink.is-current {
+  color: var(--bb-primary-deep);
+  background: rgba(123, 94, 199, 0.08);
+}
+.bb-mainnav__ddlink--all { font-weight: 600; color: var(--bb-primary); }
+.bb-mainnav__ddsep { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--bb-line); }
+@media (prefers-reduced-motion: reduce) {
+  .bb-mainnav__dd, .bb-mainnav__caret { transition: none; }
+}
+
 /* Prevent the logo + nav + icons row from overlapping on narrower "desktop"
    widths (990-1300px): let the grid tracks shrink instead of forcing their
    max-content width, and give the nav somewhere to wrap to if it's still tight. */
@@ -388,6 +446,7 @@ body {
     background-color: rgba(123, 94, 199, 0.08);
   }
   .js .menu-drawer__menu li { margin-bottom: 0; }
+  .menu-drawer__menu-item.bb-drawer-coll__all { font-weight: 600; color: var(--bb-primary); }
   .menu-drawer__menu-item > .svg-wrapper { right: 22px; width: 13px; }
   .menu-drawer__close-button { font: 500 15px/1.3 var(--bb-sans); }
 }
