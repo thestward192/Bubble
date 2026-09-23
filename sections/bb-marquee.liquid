@@ -1,0 +1,87 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+  #shopify-section-{{ section.id }} .bb-marquee__track {
+    {% if section.settings.direction == 'right' %}animation-direction: reverse;{% endif %}
+  }
+{% endstyle %}
+
+<div class="bb-marquee" data-speed="{{ section.settings.speed }}" aria-hidden="true">
+  <div class="bb-marquee__track">
+    {%- comment -%} Duplicated twice for the seamless -50% loop; each half repeats
+    the message set several times so the strip stays full (no empty gap at the
+    end) no matter how few messages are set or how wide the screen is. The
+    animation-duration is computed in JS from the actual rendered width so the
+    "speed" setting is a real, steady px/second pace regardless of repeat count. {%- endcomment -%}
+    {%- for i in (1..2) -%}
+      <div class="bb-marquee__group">
+        {%- for r in (1..6) -%}
+          {%- for block in section.blocks -%}
+            <span class="bb-marquee__item" {% if r == 1 %}{{ block.shopify_attributes }}{% endif %}>{{ block.settings.text }}</span>
+            <span class="bb-marquee__dot">&#10022;</span>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+<script>
+  (function () {
+    var root = document.currentScript.previousElementSibling;
+    if (!root || !root.classList.contains('bb-marquee')) return;
+    var track = root.querySelector('.bb-marquee__track');
+    var group = root.querySelector('.bb-marquee__group');
+    if (!track || !group) return;
+    var pxPerSecond = parseFloat(root.dataset.speed) || 30;
+    var setDuration = function () {
+      var w = group.getBoundingClientRect().width;
+      if (w > 0) track.style.animationDuration = (w / pxPerSecond) + 's';
+    };
+    setDuration();
+    window.addEventListener('resize', setDuration);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "BB — Moving ticker",
+  "tag": "section",
+  "settings": [
+    { "type": "range", "id": "speed", "label": "Speed (px/second, lower = slower)", "min": 10, "max": 100, "step": 5, "unit": "px", "default": 30 },
+    { "type": "select", "id": "direction", "label": "Direction", "options": [
+      { "value": "left", "label": "Left" }, { "value": "right", "label": "Right" } ], "default": "left" },
+    { "type": "color", "id": "bg_color", "label": "Background colour" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 14 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 14 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Message",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Handmade with love" }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "BB — Moving ticker",
+      "blocks": [
+        { "type": "item", "settings": { "text": "Handmade with love" } },
+        { "type": "item", "settings": { "text": "Premium quality beads" } },
+        { "type": "item", "settings": { "text": "Worldwide shipping" } },
+        { "type": "item", "settings": { "text": "Build your dream bangle box" } },
+        { "type": "item", "settings": { "text": "Join our live" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

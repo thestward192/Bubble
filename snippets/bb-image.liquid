@@ -1,0 +1,29 @@
+{%- comment -%}
+  Bubble Beads image helper.
+  Renders the chosen image; if the slot is empty it falls back to a demo asset
+  (when `fallback` is given) or a decorative placeholder — so unfilled editor
+  slots still look intentional. Swap any slot from the Shopify editor any time.
+  Params: image, class, label, width, eager, fallback
+{%- endcomment -%}
+{%- liquid
+  assign _cls = class | default: ''
+  assign _label = label | default: 'Image'
+  assign _w = width | default: 1200
+-%}
+{%- if image != blank -%}
+  <img class="bb-img {{ _cls }}"
+       src="{{ image | image_url: width: _w }}"
+       srcset="{{ image | image_url: width: 480 }} 480w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: 1400 }} 1400w, {{ image | image_url: width: 2000 }} 2000w"
+       sizes="(max-width: 750px) 92vw, {{ _w }}px"
+       alt="{{ image.alt | default: _label | escape }}"
+       width="{{ image.width }}" height="{{ image.height }}"
+       {% if eager %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+{%- elsif fallback != blank -%}
+  <img class="bb-img {{ _cls }}" src="{{ fallback | asset_url }}" alt="{{ _label | escape }}"
+       {% if eager %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+{%- else -%}
+  <span class="bb-ph {{ _cls }}" role="img" aria-label="{{ _label | escape }} placeholder">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l1.9 4.7L18.9 8l-3.6 3.3.9 5L12 13.9 7.8 16.3l.9-5L5.1 8l5-1.3z"/></svg>
+    <em>{{ _label }}</em>
+  </span>
+{%- endif -%}

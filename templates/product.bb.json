@@ -1,0 +1,48 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "bb-product",
+      "blocks": {
+        "a1": { "type": "assurance", "settings": { "icon": "truck", "text": "Free worldwide shipping over €60" } },
+        "a2": { "type": "assurance", "settings": { "icon": "return", "text": "30-day easy returns" } },
+        "a3": { "type": "assurance", "settings": { "icon": "lock", "text": "Secure checkout" } },
+        "f1": { "type": "feature", "settings": { "title": "Premium beads", "text": "Glass, freshwater pearl and natural stone — no cheap plastic." } },
+        "f2": { "type": "feature", "settings": { "title": "Made by hand", "text": "Hand-strung and quality-checked one piece at a time." } },
+        "f3": { "type": "feature", "settings": { "title": "Stretch fit", "text": "Strong elastic core that slips on and stays comfy all day." } }
+      },
+      "block_order": ["a1", "a2", "a3", "f1", "f2", "f3"],
+      "settings": {
+        "eyebrow": "Handmade jewelry",
+        "button_text": "Add to cart",
+        "sold_out_text": "Sold out",
+        "story_title": "Made to be worn every day",
+        "story_text": "Each piece is hand-strung with premium glass and stone beads, then checked one by one before it reaches you.",
+        "includes_title": "What's inside",
+        "includes_list": "Hand-strung beaded bracelet\nReusable velvet pouch\nCare card with styling tips",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
+    "bb_trust": {
+      "type": "bb-trust-bar",
+      "blocks": {
+        "p1": { "type": "item", "settings": { "icon": "heart", "title": "Handmade with love" } },
+        "p2": { "type": "item", "settings": { "icon": "gem", "title": "Premium quality beads" } },
+        "p3": { "type": "item", "settings": { "icon": "globe", "title": "Worldwide shipping" } },
+        "p4": { "type": "item", "settings": { "icon": "lock", "title": "Secure payments" } }
+      },
+      "block_order": ["p1", "p2", "p3", "p4"],
+      "settings": { "padding_top": 16, "padding_bottom": 24 }
+    }
+  },
+  "order": ["main", "bb_trust"]
+}

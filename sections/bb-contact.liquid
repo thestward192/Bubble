@@ -1,0 +1,234 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+  #shopify-section-{{ section.id }} .bb-contact__head .bb-h2 { font-size: {{ section.settings.heading_size }}px; }
+  @media (max-width: 900px) {
+    #shopify-section-{{ section.id }} .bb-contact__head .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.68 | round }}px; }
+  }
+{% endstyle %}
+
+<section class="bb-contact bb-section">
+  <div class="bb-container">
+
+    {%- if section.settings.show_breadcrumb -%}
+      <nav class="bb-contact__crumbs" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}">{{ section.settings.crumb_home }}</a>
+        <span aria-hidden="true">/</span>
+        <span>{{ page.title | default: section.settings.heading }}</span>
+      </nav>
+    {%- endif -%}
+
+    <header class="bb-contact__head bb-reveal">
+      <h1 class="bb-h2">{{ section.settings.heading }}</h1>
+      {%- if section.settings.subtext != blank -%}
+        <p class="bb-lead">{{ section.settings.subtext }}</p>
+      {%- endif -%}
+    </header>
+
+    <div class="bb-contact__grid">
+      <aside class="bb-contact__info bb-reveal">
+        {%- if section.settings.info_title != blank -%}
+          <h2 class="bb-contact__info-title">{{ section.settings.info_title }}</h2>
+        {%- endif -%}
+
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'detail' -%}
+              <div class="bb-contact__card" {{ block.shopify_attributes }}>
+                <span class="bb-contact__eyebrow">{{ block.settings.label }}</span>
+                <span class="bb-contact__value">
+                  {%- if block.settings.link != blank -%}
+                    <a href="{{ block.settings.link }}">{{ block.settings.value | newline_to_br }}</a>
+                  {%- else -%}
+                    {{ block.settings.value | newline_to_br }}
+                  {%- endif -%}
+                </span>
+                {%- if block.settings.note != blank -%}
+                  <span class="bb-contact__note">{{ block.settings.note }}</span>
+                {%- endif -%}
+              </div>
+
+            {%- when 'hours' -%}
+              <div class="bb-contact__hours" {{ block.shopify_attributes }}>
+                {%- if block.settings.title != blank -%}<h3>{{ block.settings.title }}</h3>{%- endif -%}
+                <ul>
+                  {%- assign rows = block.settings.rows | newline_to_br | split: '<br />' -%}
+                  {%- for row in rows -%}
+                    {%- assign rc = row | strip -%}
+                    {%- assign parts = rc | split: '|' -%}
+                    {%- if parts.size >= 2 -%}
+                      <li><span>{{ parts[0] | strip }}</span><b>{{ parts[1] | strip }}</b></li>
+                    {%- elsif rc != blank -%}
+                      <li><span>{{ rc }}</span></li>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </ul>
+              </div>
+
+            {%- when 'social' -%}
+              <div class="bb-contact__social" {{ block.shopify_attributes }}>
+                {%- if block.settings.title != blank -%}<span class="bb-contact__eyebrow">{{ block.settings.title }}</span>{%- endif -%}
+                <div class="bb-contact__social-links">
+                  {%- if block.settings.instagram != blank -%}<a href="{{ block.settings.instagram }}">Instagram</a>{%- endif -%}
+                  {%- if block.settings.tiktok != blank -%}<a href="{{ block.settings.tiktok }}">TikTok</a>{%- endif -%}
+                  {%- if block.settings.pinterest != blank -%}<a href="{{ block.settings.pinterest }}">Pinterest</a>{%- endif -%}
+                  {%- if block.settings.facebook != blank -%}<a href="{{ block.settings.facebook }}">Facebook</a>{%- endif -%}
+                </div>
+              </div>
+          {%- endcase -%}
+        {%- endfor -%}
+      </aside>
+
+      <div class="bb-contact__formcard bb-reveal">
+        {%- if section.settings.form_title != blank -%}
+          <h2 class="bb-contact__form-title">{{ section.settings.form_title }}</h2>
+        {%- endif -%}
+        {%- if section.settings.form_subtext != blank -%}
+          <p class="bb-lead">{{ section.settings.form_subtext }}</p>
+        {%- endif -%}
+
+        {%- form 'contact', class: 'bb-contact__form' -%}
+          {%- if form.posted_successfully? -%}
+            <p class="bb-contact__success">{{ section.settings.success_text }}</p>
+          {%- endif -%}
+          {%- if form.errors -%}
+            <p class="bb-contact__formerrors">{{ form.errors | default_errors }}</p>
+          {%- endif -%}
+
+          <div class="bb-contact__fields">
+            <div class="bb-contact__row">
+              <label class="bb-field">
+                <span>{{ section.settings.label_name }} *</span>
+                <input type="text" name="contact[name]" required
+                       placeholder="{{ section.settings.ph_name }}"
+                       value="{% if form.name %}{{ form.name }}{% endif %}">
+              </label>
+              <label class="bb-field">
+                <span>{{ section.settings.label_email }} *</span>
+                <input type="email" name="contact[email]" required
+                       placeholder="{{ section.settings.ph_email }}"
+                       value="{% if form.email %}{{ form.email }}{% endif %}">
+              </label>
+            </div>
+
+            <div class="bb-contact__row">
+              <label class="bb-field">
+                <span>{{ section.settings.label_phone }}</span>
+                <input type="tel" name="contact[phone]" placeholder="{{ section.settings.ph_phone }}">
+              </label>
+              <label class="bb-field">
+                <span>{{ section.settings.label_subject }} *</span>
+                <select name="contact[subject]" required>
+                  {%- assign opts = section.settings.subject_options | newline_to_br | split: '<br />' -%}
+                  {%- for o in opts -%}
+                    {%- assign oc = o | strip -%}
+                    {%- if oc != blank -%}<option value="{{ oc }}">{{ oc }}</option>{%- endif -%}
+                  {%- endfor -%}
+                </select>
+              </label>
+            </div>
+
+            <label class="bb-field">
+              <span>{{ section.settings.label_message }} *</span>
+              <textarea name="contact[body]" rows="6" required
+                        placeholder="{{ section.settings.ph_message }}">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+            </label>
+          </div>
+
+          {%- if section.settings.privacy_text != blank -%}
+            <label class="bb-contact__consent">
+              <input type="checkbox" name="contact[consent]" required>
+              <span>{{ section.settings.privacy_text }}</span>
+            </label>
+          {%- endif -%}
+
+          <button type="submit" class="bb-btn bb-contact__submit">{{ section.settings.button_text }}</button>
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "BB — Contact",
+  "tag": "section",
+  "settings": [
+    { "type": "checkbox", "id": "show_breadcrumb", "label": "Show breadcrumb", "default": true },
+    { "type": "text", "id": "crumb_home", "label": "Breadcrumb: home label", "default": "Home" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Contact" },
+    { "type": "text", "id": "subtext", "label": "Sub-heading", "default": "We're here to help. We reply within 24 hours." },
+    { "type": "range", "id": "heading_size", "label": "Heading size (px)", "min": 28, "max": 72, "step": 2, "unit": "px", "default": 52 },
+    { "type": "header", "content": "Left column" },
+    { "type": "text", "id": "info_title", "label": "Left column title", "default": "Contact information" },
+    { "type": "header", "content": "Form" },
+    { "type": "text", "id": "form_title", "label": "Form title", "default": "Send us a message" },
+    { "type": "text", "id": "form_subtext", "label": "Form sub-text", "default": "Fill in the form and we'll get back to you as soon as we can." },
+    { "type": "text", "id": "label_name", "label": "Field label: name", "default": "Name" },
+    { "type": "text", "id": "ph_name", "label": "Placeholder: name", "default": "Your name" },
+    { "type": "text", "id": "label_email", "label": "Field label: email", "default": "Email" },
+    { "type": "text", "id": "ph_email", "label": "Placeholder: email", "default": "you@email.com" },
+    { "type": "text", "id": "label_phone", "label": "Field label: phone", "default": "Phone" },
+    { "type": "text", "id": "ph_phone", "label": "Placeholder: phone", "default": "+1 555 000 0000" },
+    { "type": "text", "id": "label_subject", "label": "Field label: subject", "default": "Subject" },
+    { "type": "textarea", "id": "subject_options", "label": "Subject options (one per line)", "default": "General enquiry\nOrder question\nReturns & exchanges\nWholesale / collab\nOther" },
+    { "type": "text", "id": "label_message", "label": "Field label: message", "default": "Message" },
+    { "type": "text", "id": "ph_message", "label": "Placeholder: message", "default": "Write your message here…" },
+    { "type": "inline_richtext", "id": "privacy_text", "label": "Consent text (add a link to your Privacy Policy)", "default": "I've read and accept the <a href=\"/policies/privacy-policy\">Privacy Policy</a>. My details will only be used to handle my enquiry." },
+    { "type": "text", "id": "button_text", "label": "Button text", "default": "Send message" },
+    { "type": "text", "id": "success_text", "label": "Success message", "default": "Thanks! Your message has been sent — we'll reply within 24 hours." },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "detail",
+      "name": "Detail",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Email" },
+        { "type": "textarea", "id": "value", "label": "Value", "default": "hello@bubblebeads.shop" },
+        { "type": "text", "id": "note", "label": "Small note (optional)", "default": "We reply within 24 h" },
+        { "type": "text", "id": "link", "label": "Link (optional — e.g. mailto: or tel:)" }
+      ]
+    },
+    {
+      "type": "hours",
+      "name": "Opening hours",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Opening hours" },
+        { "type": "textarea", "id": "rows", "label": "Rows — \"Day | Time\" per line", "default": "Monday – Friday | 10:00 – 18:00\nSaturday | 11:00 – 14:00\nSunday | Closed" }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Social links",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Follow us" },
+        { "type": "url", "id": "instagram", "label": "Instagram URL" },
+        { "type": "url", "id": "tiktok", "label": "TikTok URL" },
+        { "type": "url", "id": "pinterest", "label": "Pinterest URL" },
+        { "type": "url", "id": "facebook", "label": "Facebook URL" }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    {
+      "name": "BB — Contact",
+      "blocks": [
+        { "type": "detail", "settings": { "label": "Email", "value": "hello@bubblebeads.shop", "note": "We reply within 24 h", "link": "mailto:hello@bubblebeads.shop" } },
+        { "type": "detail", "settings": { "label": "Phone / WhatsApp", "value": "+1 555 012 3456", "note": "Mon–Fri, 10:00–18:00", "link": "tel:+15550123456" } },
+        { "type": "detail", "settings": { "label": "Studio", "value": "Nijmegen, Netherlands", "note": "Visits by appointment only" } },
+        { "type": "hours", "settings": {} },
+        { "type": "social", "settings": {} }
+      ]
+    }
+  ]
+}
+{% endschema %}

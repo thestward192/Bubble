@@ -1,0 +1,86 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+{% endstyle %}
+
+{%- capture ico_heart -%}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.35-9.5-8.5C1 8 2.8 4.5 6.2 4.5c2 0 3.4 1.2 4.3 2.6.9-1.4 2.3-2.6 4.3-2.6 3.4 0 5.2 3.5 3.7 7C19 15.65 12 20 12 20z"/></svg>{%- endcapture -%}
+{%- capture ico_gem -%}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l3 6-9 12L3 9zM3 9h18M9 3l-3 6 6 12M15 3l3 6-6 12"/></svg>{%- endcapture -%}
+{%- capture ico_globe -%}<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>{%- endcapture -%}
+{%- capture ico_lock -%}<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>{%- endcapture -%}
+{%- capture ico_chat -%}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"/></svg>{%- endcapture -%}
+{%- capture ico_spark -%}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>{%- endcapture -%}
+{%- capture ico_truck -%}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>{%- endcapture -%}
+
+<section class="bb-trust bb-section">
+  <div class="bb-container">
+    <div class="bb-trust__inner">
+      {%- for block in section.blocks -%}
+        <div class="bb-trust__item bb-reveal" {{ block.shopify_attributes }}>
+          <span class="bb-trust__ico">
+            {%- case block.settings.icon -%}
+              {%- when 'heart' -%}{{ ico_heart }}
+              {%- when 'gem' -%}{{ ico_gem }}
+              {%- when 'globe' -%}{{ ico_globe }}
+              {%- when 'lock' -%}{{ ico_lock }}
+              {%- when 'chat' -%}{{ ico_chat }}
+              {%- when 'truck' -%}{{ ico_truck }}
+              {%- else -%}{{ ico_spark }}
+            {%- endcase -%}
+          </span>
+          <span class="bb-trust__txt">
+            <b>{{ block.settings.title }}</b>
+            {%- if block.settings.text != blank -%}<span>{{ block.settings.text }}</span>{%- endif -%}
+          </span>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "BB — Trust bar",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 20 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 20 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Promise",
+      "settings": [
+        { "type": "select", "id": "icon", "label": "Icon", "options": [
+          { "value": "heart", "label": "Heart" },
+          { "value": "gem", "label": "Gem" },
+          { "value": "globe", "label": "Globe" },
+          { "value": "lock", "label": "Lock" },
+          { "value": "chat", "label": "Chat" },
+          { "value": "truck", "label": "Truck" },
+          { "value": "spark", "label": "Sparkle" } ], "default": "heart" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Handmade with love" },
+        { "type": "text", "id": "text", "label": "Small text (optional)" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "BB — Trust bar",
+      "blocks": [
+        { "type": "item", "settings": { "icon": "heart", "title": "Handmade with love" } },
+        { "type": "item", "settings": { "icon": "gem", "title": "Premium quality beads" } },
+        { "type": "item", "settings": { "icon": "globe", "title": "Worldwide shipping" } },
+        { "type": "item", "settings": { "icon": "lock", "title": "Secure payments" } },
+        { "type": "item", "settings": { "icon": "chat", "title": "Join our community", "text": "@bubblebeads.shop" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

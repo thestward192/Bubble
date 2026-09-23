@@ -1,0 +1,83 @@
+{{ 'bb-collection.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background: var(--bbc-bg, #faf8ff);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+{%- endstyle -%}
+
+<div class="bb-shop-hero color-{{ section.settings.color_scheme }}">
+  <div class="bb-shop-hero__inner">
+    {%- if section.settings.show_breadcrumb -%}
+      <div class="bb-shop-crumb">
+        <a href="{{ routes.root_url }}">{{ 'sections.bb_collection_hero.home' | t }}</a>
+        <span aria-hidden="true">/</span>
+        {{ collection.title | escape }}
+      </div>
+    {%- endif -%}
+
+    <h1 class="bb-shop-hero__title">{{ collection.title | escape }}</h1>
+
+    {%- if section.settings.show_collection_description and collection.description != blank -%}
+      <div class="bb-shop-hero__desc rte">{{ collection.description }}</div>
+    {%- elsif section.settings.fallback_description != blank -%}
+      <div class="bb-shop-hero__desc rte">{{ section.settings.fallback_description }}</div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "BB – Cabecera tienda",
+  "class": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Mostrar migas de pan (Inicio / Colección)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "label": "Mostrar descripción de la colección",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "fallback_description",
+      "label": "Texto si la colección no tiene descripción",
+      "default": "Piezas únicas, hechas a mano con materiales de calidad. Cada detalle importa."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Esquema de color",
+      "default": "scheme-1"
+    },
+    { "type": "header", "content": "Espaciado" },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espacio superior (px)",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espacio inferior (px)",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 8
+    }
+  ]
+}
+{% endschema %}

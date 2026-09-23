@@ -1,0 +1,109 @@
+{% comment %}
+  Renders a product card for the "Bubble Beads" custom products page.
+  Accepts:
+  - card_product: {Object} Product Liquid object
+  - lazy_load: {Boolean}
+{% endcomment %}
+{%- if card_product and card_product != empty -%}
+  {%- liquid
+    assign tags_lower = card_product.tags | join: ',' | downcase
+    assign is_new = false
+    assign is_top = false
+    if tags_lower contains 'nuevo' or tags_lower contains 'new'
+      assign is_new = true
+    endif
+    if tags_lower contains 'top'
+      assign is_top = true
+    endif
+    assign on_sale = false
+    if card_product.compare_at_price > card_product.price and card_product.available
+      assign on_sale = true
+    endif
+    assign discount_pct = 0
+    if on_sale
+      assign discount_pct = card_product.compare_at_price | minus: card_product.price | times: 100.0 | divided_by: card_product.compare_at_price | round
+    endif
+    assign eyebrow = card_product.type | default: card_product.vendor
+  -%}
+  <div class="bb-pcard">
+    <a href="{{ card_product.url }}" class="bb-pcard__media-link">
+      <div class="bb-pcard__media">
+        {%- if card_product.featured_media -%}
+          <img
+            srcset="
+              {%- if card_product.featured_media.width >= 360 -%}{{ card_product.featured_media | image_url: width: 360 }} 360w,{%- endif -%}
+              {%- if card_product.featured_media.width >= 533 -%}{{ card_product.featured_media | image_url: width: 533 }} 533w,{%- endif -%}
+              {%- if card_product.featured_media.width >= 720 -%}{{ card_product.featured_media | image_url: width: 720 }} 720w,{%- endif -%}
+              {{ card_product.featured_media | image_url }} {{ card_product.featured_media.width }}w
+            "
+            src="{{ card_product.featured_media | image_url: width: 533 }}"
+            sizes="(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw"
+            alt="{{ card_product.featured_media.alt | escape }}"
+            {% unless lazy_load == false %}
+              loading="lazy"
+            {% endunless %}
+            width="{{ card_product.featured_media.width }}"
+            height="{{ card_product.featured_media.height }}"
+          >
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'bb-pcard__placeholder' }}
+        {%- endif -%}
+
+        {%- if is_new -%}
+          <span class="bb-pcard__badge">{{ 'sections.bb_card.new' | t }}</span>
+        {%- elsif on_sale -%}
+          <span class="bb-pcard__badge">{{ 'sections.bb_card.sale' | t }}</span>
+        {%- elsif is_top -%}
+          <span class="bb-pcard__badge">{{ 'sections.bb_card.top' | t }}</span>
+        {%- endif -%}
+      </div>
+    </a>
+    <div class="bb-pcard__body">
+      {%- if eyebrow != blank -%}
+        <div class="bb-pcard__eyebrow">{{ eyebrow | escape }}</div>
+      {%- endif -%}
+      <h3 class="bb-pcard__title">
+        <a href="{{ card_product.url }}">{{ card_product.title | escape }}</a>
+      </h3>
+      <div class="bb-pcard__rating" aria-hidden="true">
+        {%- for i in (1..5) -%}
+          <svg viewBox="0 0 20 20" width="10" height="10" fill="currentColor"><path d="M10 1.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg>
+        {%- endfor -%}
+        {%- if card_product.metafields.reviews.rating_count.value != blank -%}
+          <span class="bb-pcard__rating-count">({{ card_product.metafields.reviews.rating_count.value }})</span>
+        {%- endif -%}
+      </div>
+      <div class="bb-pcard__price">
+        <span class="bb-pcard__price-now">{{ card_product.price | money }}</span>
+        {%- if on_sale -%}
+          <span class="bb-pcard__price-old">{{ card_product.compare_at_price | money }}</span>
+          <span class="bb-pcard__price-off">-{{ discount_pct }}%</span>
+        {%- endif -%}
+      </div>
+
+      {%- if card_product.available -%}
+        <product-form class="bb-pcard__add-wrap">
+          {%- form 'product', card_product, novalidate: 'novalidate' -%}
+            <input
+              type="hidden"
+              name="id"
+              value="{{ card_product.selected_or_first_available_variant.id }}"
+            >
+            {%- if card_product.has_only_default_variant -%}
+              <button type="submit" name="add" class="bb-pcard__add">
+                <span>{{ 'sections.bb_card.add_to_cart' | t }}</span>
+                {%- render 'loading-spinner' -%}
+              </button>
+            {%- else -%}
+              <a href="{{ card_product.url }}" class="bb-pcard__add">
+                {{ 'sections.bb_card.choose_options' | t }}
+              </a>
+            {%- endif -%}
+          {%- endform -%}
+        </product-form>
+      {%- else -%}
+        <span class="bb-pcard__add bb-pcard__add--soldout">{{ 'sections.bb_card.sold_out' | t }}</span>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}

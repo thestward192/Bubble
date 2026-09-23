@@ -1,0 +1,619 @@
+/* ==========================================================================
+   Bubble Beads — "Toda la joyería" products page
+   Restyles Dawn's native collection banner + facets + pagination, and
+   defines the fully custom .bb-pcard product card. All spacing that the
+   merchant controls lives in each section's schema (see bb-collection-hero.liquid
+   and bb-collection-grid.liquid) — this file only carries the visual skin.
+   ========================================================================== */
+
+:root {
+  --bbc-bg: #faf8ff;
+  --bbc-card: #fefbff;
+  --bbc-ink: #2a1a38;
+  --bbc-primary: #5c3d72;
+  --bbc-muted: #b8a8c8;
+  --bbc-gold: #c8a86a;
+  --bbc-rose: #c9928a;
+  --bbc-line: rgba(92, 61, 114, 0.14);
+  --bbc-shadow: 0 2px 14px rgba(92, 61, 114, 0.08);
+  --bbc-shadow-hover: 0 14px 30px -10px rgba(92, 61, 114, 0.28);
+  --bbc-radius: 16px;
+  --bbc-pill: 999px;
+  --bbc-serif: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+  --bbc-sans: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bbc-gutter: clamp(24px, 5vw, 64px);
+  --bbc-maxw: 1280px;
+  --bbc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bb-shop-hero,
+.bb-shop-grid {
+  background: var(--bbc-bg);
+  font-family: var(--bbc-sans);
+  color: var(--bbc-ink);
+}
+
+/* ---------------------------------------------------------------- HERO */
+.bb-shop-hero__inner {
+  max-width: var(--bbc-maxw);
+  margin: 0 auto;
+  padding: 0 var(--bbc-gutter);
+}
+.bb-shop-crumb {
+  font: 500 12px/1 var(--bbc-sans);
+  color: var(--bbc-muted);
+  margin-bottom: 18px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.bb-shop-crumb a {
+  color: var(--bbc-muted);
+  text-decoration: none;
+}
+.bb-shop-crumb a:hover {
+  color: var(--bbc-primary);
+}
+.bb-shop-hero__title {
+  font-family: var(--bbc-serif);
+  font-weight: 400;
+  font-size: clamp(32px, 5vw, 48px);
+  line-height: 1.1;
+  color: var(--bbc-ink);
+  margin: 0 0 12px;
+}
+.bb-shop-hero__desc {
+  max-width: 620px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--bbc-ink);
+  opacity: 0.72;
+}
+.bb-shop-hero__desc p {
+  margin: 0;
+}
+
+/* ------------------------------------------------------------- LAYOUT */
+.bb-shop-grid__layout {
+  max-width: var(--bbc-maxw);
+  margin: 0 auto;
+  padding: 0 var(--bbc-gutter);
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 56px;
+  align-items: start;
+}
+/* ----------------------------------------------------------- SIDEBAR */
+.bb-shop-grid__aside {
+  position: sticky;
+  top: 112px;
+  padding-top: 28px;
+  font-family: var(--bbc-sans);
+}
+/* Mobile/tablet: stack the filters above the grid (order: -1) instead of
+   sticky-positioned beside it — this MUST come after the base rule above,
+   since a media query does not out-rank a later plain rule of the same
+   specificity; putting it earlier let "position: sticky" win at every
+   width and made the filter bar float on top of the product cards. */
+@media screen and (max-width: 989px) {
+  .bb-shop-grid__layout {
+    grid-template-columns: 1fr;
+  }
+  .bb-shop-grid__aside {
+    order: -1;
+    position: static;
+    padding-top: 0;
+  }
+}
+.bb-shop-grid__aside .facets__heading,
+.bb-shop-grid__aside .facets__heading--vertical {
+  font: 700 12px/1 var(--bbc-sans);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bbc-ink);
+  margin: 0 0 20px;
+}
+.bb-shop-grid__aside .active-facets-vertical-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1 1 100%;
+  width: 100%;
+  margin-bottom: 16px;
+}
+.bb-shop-grid__aside .active-facets__button-remove,
+.bb-shop-grid__aside .facets__reset {
+  font: 500 12px/1 var(--bbc-sans);
+  color: var(--bbc-primary);
+  text-decoration: none;
+}
+/* pills for the currently-selected filters (e.g. "Material: Crystal ×") */
+.bb-shop-grid__aside .active-facets-desktop {
+  margin-bottom: 8px;
+}
+.bb-shop-grid__aside .active-facets-desktop facet-remove {
+  display: inline-block;
+  margin: 0 8px 10px 0;
+}
+.bb-shop-grid__aside .active-facets__button {
+  text-decoration: none;
+}
+.bb-shop-grid__aside .active-facets__button-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--bbc-line);
+  border-radius: var(--bbc-pill);
+  background: #fff;
+  color: var(--bbc-primary);
+  font: 500 12px/1 var(--bbc-sans);
+  white-space: nowrap;
+  transition: background 0.2s var(--bbc-ease), color 0.2s var(--bbc-ease), border-color 0.2s var(--bbc-ease);
+}
+.bb-shop-grid__aside .active-facets__button:hover .active-facets__button-inner {
+  background: var(--bbc-primary);
+  color: #fff;
+  border-color: var(--bbc-primary);
+}
+.bb-shop-grid__aside .active-facets__button-inner .svg-wrapper {
+  width: 9px;
+  height: 9px;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.bb-shop-grid__aside .active-facets__button-inner .svg-wrapper svg {
+  width: 100%;
+  height: 100%;
+}
+/* every filter title gets the same top spacing, whether it's first in the
+   list or not, and whether or not there are active-filter pills above it */
+.bb-shop-grid__aside .facets__disclosure-vertical {
+  border-bottom: 1px solid var(--bbc-line);
+  padding: 18px 0;
+}
+.bb-shop-grid__aside .facets__summary {
+  font: 700 10px/1 var(--bbc-sans);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bbc-primary);
+  cursor: pointer;
+  list-style: none;
+}
+.bb-shop-grid__aside .facets__summary::-webkit-details-marker {
+  display: none;
+}
+.bb-shop-grid__aside .facets__summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.bb-shop-grid__aside .facets__summary svg {
+  width: 10px;
+  height: 10px;
+  color: var(--bbc-primary);
+  transition: transform 0.25s var(--bbc-ease);
+}
+.bb-shop-grid__aside details[open] > summary svg {
+  transform: rotate(180deg);
+}
+.bb-shop-grid__aside .facets__display-vertical {
+  margin-top: 14px;
+}
+.bb-shop-grid__aside .facets__list--vertical {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bb-shop-grid__aside .facet-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 400 14px/1.2 var(--bbc-sans);
+  color: var(--bbc-ink);
+  cursor: pointer;
+}
+.bb-shop-grid__aside .facet-checkbox svg {
+  display: none;
+}
+.bb-shop-grid__aside .facet-checkbox input[type='checkbox'] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  position: static !important;
+  inset: auto !important;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--bbc-line);
+  border-radius: 5px;
+  margin: 0 !important;
+  display: grid !important;
+  place-content: center;
+  background: #fff;
+  opacity: 1 !important;
+  cursor: pointer;
+}
+.bb-shop-grid__aside .facet-checkbox input[type='checkbox']::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  transform: scale(0);
+  transition: transform 0.15s var(--bbc-ease);
+  background: var(--bbc-primary);
+}
+.bb-shop-grid__aside .facet-checkbox input[type='checkbox']:checked::before {
+  transform: scale(1);
+}
+.bb-shop-grid__aside .facet-checkbox.disabled {
+  opacity: 0.4;
+}
+.bb-shop-grid__aside .facet-checkbox__text-label {
+  color: inherit;
+}
+.bb-shop-grid__aside .button-show-more {
+  font: 500 12px/1 var(--bbc-sans);
+  color: var(--bbc-primary);
+  margin-top: 10px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* price range slider */
+.bb-shop-grid__aside .facets__header-vertical {
+  display: none;
+}
+.bb-shop-grid__aside price-range {
+  display: block;
+}
+.bb-shop-grid__aside .field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.bb-shop-grid__aside .field__input {
+  width: 70px;
+  border: 1px solid var(--bbc-line);
+  border-radius: var(--bbc-pill);
+  padding: 8px 10px;
+  font: 400 13px/1 var(--bbc-sans);
+  color: var(--bbc-ink);
+  background: #fff;
+}
+.bb-shop-grid__aside .field__label {
+  display: none;
+}
+.bb-shop-grid__aside .field-currency {
+  font-size: 13px;
+  color: var(--bbc-muted);
+}
+/* once JS builds the visual slider, hide Dawn's raw number fields */
+.bb-shop-grid__aside price-range.bb-price-enhanced .field,
+.bb-shop-grid__aside price-range.bb-price-enhanced .field-currency {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.bb-price-slider {
+  position: relative;
+  padding-top: 28px;
+}
+.bb-price-slider__bubble {
+  position: absolute;
+  top: 0;
+  left: var(--bb-range-pct, 100%);
+  transform: translateX(-50%);
+  background: var(--bbc-primary);
+  color: #fff;
+  font: 700 11px/1 var(--bbc-sans);
+  padding: 4px 9px;
+  border-radius: var(--bbc-pill);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.bb-price-slider__bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--bbc-primary);
+}
+.bb-price-slider__range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 16px;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+.bb-price-slider__range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--bbc-pill);
+  background: linear-gradient(
+    to right,
+    var(--bbc-primary) 0%,
+    var(--bbc-primary) var(--bb-range-pct, 50%),
+    var(--bbc-line) var(--bb-range-pct, 50%),
+    var(--bbc-line) 100%
+  );
+}
+.bb-price-slider__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bbc-primary);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(92, 61, 114, 0.4);
+}
+.bb-price-slider__range::-moz-range-track {
+  height: 4px;
+  border-radius: var(--bbc-pill);
+  background: var(--bbc-line);
+}
+.bb-price-slider__range::-moz-range-progress {
+  height: 4px;
+  border-radius: var(--bbc-pill);
+  background: var(--bbc-primary);
+}
+.bb-price-slider__range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bbc-primary);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(92, 61, 114, 0.4);
+}
+.bb-price-slider__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font: 500 12px/1 var(--bbc-sans);
+  color: var(--bbc-muted);
+}
+
+/* -------------------------------------------------------------- MAIN */
+.bb-shop-grid__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--bbc-line);
+}
+.bb-shop-grid__toolbar form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.bb-shop-grid__count {
+  margin: 0;
+  font: 500 14px/1 var(--bbc-sans);
+  color: var(--bbc-ink);
+}
+.bb-shop-grid__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  width: auto;
+  font-size: 13px;
+  color: var(--bbc-muted);
+}
+.bb-shop-grid__sort label {
+  white-space: nowrap;
+}
+.bb-shop-grid__sort-select {
+  display: inline-block;
+  width: auto;
+  max-width: max-content;
+  border: 1px solid var(--bbc-line);
+  border-radius: var(--bbc-pill);
+  padding: 8px 32px 8px 14px;
+  font: 500 13px/1 var(--bbc-sans);
+  color: var(--bbc-ink);
+  background: #fff;
+  cursor: pointer;
+}
+
+.bb-shop-grid__list {
+  display: grid;
+  gap: 28px 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.bb-shop-grid__empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--bbc-ink);
+}
+
+.bb-shop-grid__pagination {
+  margin-top: 48px;
+  display: flex;
+  justify-content: center;
+}
+.bb-shop-grid__pagination nav {
+  font-family: var(--bbc-sans);
+}
+.bb-shop-grid__pagination a,
+.bb-shop-grid__pagination span {
+  color: var(--bbc-ink);
+}
+.bb-shop-grid__pagination .active {
+  color: var(--bbc-primary);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------- PRODUCT CARD */
+.bb-pcard {
+  position: relative;
+  font-family: var(--bb-sans, var(--bbc-sans));
+  color: var(--bb-ink, var(--bbc-ink));
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid var(--bb-line, rgba(123, 94, 199, 0.14));
+  border-radius: var(--bb-radius-sm, 14px);
+  overflow: hidden;
+  transition: border-color 0.45s var(--bb-ease, ease), box-shadow 0.45s var(--bb-ease, ease), transform 0.45s var(--bb-ease, ease);
+}
+.bb-pcard:hover {
+  border-color: rgba(123, 94, 199, 0.3);
+  box-shadow: 0 28px 46px -32px rgba(91, 63, 160, 0.4);
+  transform: translateY(-3px);
+}
+.bb-pcard__media-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.bb-pcard__media {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #F6F2FB;
+}
+.bb-pcard__media img,
+.bb-pcard__placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.9s var(--bb-ease, ease);
+}
+.bb-pcard:hover .bb-pcard__media img {
+  transform: scale(1.035);
+}
+.bb-pcard__badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 1;
+  font: 600 10px/1 var(--bb-sans, var(--bbc-sans));
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(30, 20, 45, 0.45), 0 1px 10px rgba(30, 20, 45, 0.25);
+}
+.bb-pcard__add-wrap {
+  margin-top: 14px;
+}
+.bb-pcard__add {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 11px 0;
+  border: 1px solid var(--bb-line, rgba(123, 94, 199, 0.22));
+  border-radius: var(--bb-radius-pill, 999px);
+  background: transparent;
+  color: var(--bb-ink, var(--bbc-ink));
+  font: 500 11px/1 var(--bb-sans, var(--bbc-sans));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.35s var(--bb-ease, ease), border-color 0.35s var(--bb-ease, ease), color 0.35s var(--bb-ease, ease);
+}
+.bb-pcard__add .loading__spinner:not(.hidden) {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+}
+.bb-pcard__add.loading span { visibility: hidden; }
+.bb-pcard__add:hover {
+  background: var(--bb-primary, var(--bbc-primary));
+  border-color: var(--bb-primary, var(--bbc-primary));
+  color: #fff;
+}
+.bb-pcard__add--soldout {
+  border-color: var(--bb-line, rgba(123, 94, 199, 0.14));
+  color: var(--bb-ink-soft, var(--bbc-muted));
+  cursor: default;
+}
+.bb-pcard__body {
+  padding: 18px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.bb-pcard__eyebrow {
+  font: 500 9.5px/1 var(--bb-sans, var(--bbc-sans));
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bb-ink-soft, var(--bbc-muted));
+}
+.bb-pcard__title {
+  margin: 4px 0 0;
+  font: 400 16px/1.35 var(--bb-serif, var(--bbc-serif));
+}
+.bb-pcard__title a {
+  color: var(--bb-ink, var(--bbc-ink));
+  text-decoration: none;
+  transition: color 0.25s var(--bb-ease, ease);
+}
+.bb-pcard:hover .bb-pcard__title a {
+  color: var(--bb-primary-deep, var(--bbc-primary));
+}
+.bb-pcard__rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
+  color: var(--bb-star, #CBBAEF);
+}
+.bb-pcard__rating-count {
+  font-size: 11px;
+  color: var(--bb-ink-soft, var(--bbc-muted));
+  margin-left: 4px;
+}
+.bb-pcard__price {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-top: 5px;
+}
+.bb-pcard__price-now {
+  font: 500 14.5px/1 var(--bb-sans, var(--bbc-sans));
+  color: var(--bb-ink, var(--bbc-ink));
+}
+.bb-pcard__price-old {
+  font: 400 12px/1 var(--bb-sans, var(--bbc-sans));
+  color: var(--bb-ink-soft, var(--bbc-muted));
+  text-decoration: line-through;
+}
+.bb-pcard__price-off {
+  font: 500 11px/1 var(--bb-sans, var(--bbc-sans));
+  color: var(--bb-pink, #E97CB4);
+}
+
+/* --------------------------------------------------------- RESPONSIVE */
+@media screen and (max-width: 749px) {
+  .bb-shop-grid__list {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px 14px;
+  }
+}

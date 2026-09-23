@@ -1,0 +1,281 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign cols = section.settings.columns | default: 5
+  assign cols_md = cols | at_most: 4
+  assign cols_sm = cols | at_most: 2
+-%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+  }
+  #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size }}px; }
+
+  #shopify-section-{{ section.id }} .bb-ugc__handle {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    flex: none;
+    padding: 6px 16px 6px 6px;
+    border: 1px solid var(--bb-line);
+    border-radius: var(--bb-radius-pill);
+    color: var(--bb-ink);
+    font: 500 13px/1 var(--bb-sans);
+    text-decoration: none;
+    transition: border-color 0.3s var(--bb-ease), background 0.3s var(--bb-ease);
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__handle:hover {
+    border-color: var(--bb-primary);
+    background: #ffffff;
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__handle-ico {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    flex: none;
+    background: linear-gradient(135deg, var(--bb-primary), var(--bb-pink));
+    color: #ffffff;
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__handle-ico svg { width: 13px; height: 13px; }
+
+  /* organic grid: a branded invite tile up front, a couple of tall photos for rhythm */
+  #shopify-section-{{ section.id }} .bb-ugc__grid {
+    display: grid;
+    grid-template-columns: repeat({{ cols }}, 1fr);
+    grid-auto-rows: clamp(110px, 11.5vw, 165px);
+    grid-auto-flow: dense;
+    gap: clamp(8px, 1.2vw, 14px);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #F6F2FB;
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__item--cta {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__grid .bb-ugc__item:not(.bb-ugc__item--cta):nth-child(4n) {
+    grid-row: span 2;
+  }
+
+  #shopify-section-{{ section.id }} .bb-ugc__link { display: block; width: 100%; height: 100%; }
+  #shopify-section-{{ section.id }} .bb-ugc__item img,
+  #shopify-section-{{ section.id }} .bb-ugc__item .bb-ph {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s var(--bb-ease);
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__item:hover img { transform: scale(1.06); }
+
+  #shopify-section-{{ section.id }} .bb-ugc__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(21, 13, 39, 0.6) 0%, rgba(21, 13, 39, 0) 46%);
+    opacity: 0;
+    transition: opacity 0.35s var(--bb-ease);
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__item:hover .bb-ugc__scrim { opacity: 1; }
+
+  #shopify-section-{{ section.id }} .bb-ugc__badge {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #ffffff;
+    font: 600 11px/1 var(--bb-sans);
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s var(--bb-ease), transform 0.3s var(--bb-ease);
+    pointer-events: none;
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__badge svg { width: 15px; height: 15px; }
+  #shopify-section-{{ section.id }} .bb-ugc__item:hover .bb-ugc__badge {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* the branded invite tile itself */
+  #shopify-section-{{ section.id }} .bb-ugc__cta-link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    padding: clamp(18px, 2.4vw, 28px);
+    background:
+      radial-gradient(120% 130% at 15% 0%, rgba(255, 255, 255, 0.28), transparent 60%),
+      linear-gradient(150deg, var(--bb-primary) 0%, var(--bb-pink) 100%);
+    color: #ffffff;
+    text-decoration: none;
+    transition: transform 0.4s var(--bb-ease);
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__item--cta:hover .bb-ugc__cta-link { transform: scale(1.015); }
+  #shopify-section-{{ section.id }} .bb-ugc__cta-ico {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__cta-ico svg { width: 19px; height: 19px; }
+  #shopify-section-{{ section.id }} .bb-ugc__cta-title {
+    font-family: var(--bb-serif);
+    font-weight: 600;
+    font-size: clamp(19px, 1.8vw, 24px);
+    line-height: 1.2;
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__cta-sub {
+    font: 500 13px/1.5 var(--bb-sans);
+    color: rgba(255, 255, 255, 0.88);
+    max-width: 24ch;
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__cta-handle {
+    margin-top: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: 600 12.5px/1 var(--bb-sans);
+    padding: 8px 14px;
+    border-radius: var(--bb-radius-pill);
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+  #shopify-section-{{ section.id }} .bb-ugc__cta-handle svg { width: 12px; height: 12px; }
+
+  @media (max-width: 980px) {
+    #shopify-section-{{ section.id }} .bb-ugc__grid { grid-template-columns: repeat({{ cols_md }}, 1fr); }
+  }
+  @media (max-width: 600px) {
+    #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.8 | round }}px; }
+    #shopify-section-{{ section.id }} .bb-ugc__grid {
+      grid-template-columns: repeat({{ cols_sm }}, 1fr);
+      grid-auto-rows: clamp(120px, 32vw, 170px);
+      gap: 8px;
+    }
+    #shopify-section-{{ section.id }} .bb-ugc__item { border-radius: 9px; }
+    #shopify-section-{{ section.id }} .bb-ugc__item--cta { grid-column: span 2; grid-row: span 2; }
+    #shopify-section-{{ section.id }} .bb-ugc__badge { left: 9px; bottom: 9px; font-size: 10px; }
+    #shopify-section-{{ section.id }} .bb-ugc__badge svg { width: 13px; height: 13px; }
+  }
+{% endstyle %}
+
+{%- assign bb_demos = 'bb-demo-1.jpg,bb-demo-2.jpg,bb-demo-3.jpg,bb-demo-4.jpg,bb-demo-5.jpg,bb-demo-6.jpg,bb-demo-7.jpg,bb-demo-8.jpg,bb-demo-9.jpg,bb-demo-hair.jpg,bb-demo-hair2.jpg,bb-demo-box1.jpg' | split: ',' -%}
+
+<section class="bb-ugc bb-section">
+  <div class="bb-container">
+    <div class="bb-head bb-reveal">
+      <div class="bb-head__title">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="bb-eyebrow bb-eyebrow--plain">{{ section.settings.eyebrow }}</span>
+        {%- endif -%}
+        <h2 class="bb-h2">{{ section.settings.heading }}</h2>
+      </div>
+      {%- if section.settings.handle_label != blank -%}
+        <a class="bb-ugc__handle" href="{{ section.settings.handle_link | default: '#' }}" target="_blank" rel="noopener">
+          <span class="bb-ugc__handle-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+          </span>
+          {{ section.settings.handle_label }}
+        </a>
+      {%- endif -%}
+    </div>
+
+    <ul class="bb-ugc__grid">
+      <li class="bb-ugc__item bb-ugc__item--cta bb-reveal">
+        <a class="bb-ugc__cta-link" href="{{ section.settings.handle_link | default: '#' }}" target="_blank" rel="noopener">
+          <span class="bb-ugc__cta-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+          </span>
+          <span class="bb-ugc__cta-title">{{ section.settings.cta_title | default: 'Share your look' }}</span>
+          <span class="bb-ugc__cta-sub">{{ section.settings.cta_text | default: 'Tag us for a chance to be featured right here.' }}</span>
+          {%- if section.settings.handle_label != blank -%}
+            <span class="bb-ugc__cta-handle">
+              {{ section.settings.handle_label }}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          {%- endif -%}
+        </a>
+      </li>
+      {%- for block in section.blocks -%}
+        <li class="bb-ugc__item bb-reveal" {{ block.shopify_attributes }}>
+          <a class="bb-ugc__link" href="{{ block.settings.link | default: '#' }}" {% if block.settings.link != blank %}target="_blank" rel="noopener"{% endif %} aria-label="View on Instagram">
+            {% render 'bb-image', image: block.settings.image, label: 'Community photo', width: 500, fallback: bb_demos[forloop.index0] %}
+          </a>
+          <span class="bb-ugc__scrim" aria-hidden="true"></span>
+          <span class="bb-ugc__badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+            View post
+          </span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "BB — Community gallery",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow (small label above heading)", "default": "Community" },
+    { "type": "text", "id": "heading", "label": "Section heading", "default": "Tag us to be featured" },
+    { "type": "range", "id": "heading_size", "label": "Heading size (px)", "min": 20, "max": 60, "step": 2, "unit": "px", "default": 32 },
+    { "type": "text", "id": "handle_label", "label": "Instagram handle label", "default": "@bubblebeads.shop" },
+    { "type": "url", "id": "handle_link", "label": "Instagram link" },
+    { "type": "header", "content": "Invite tile (first cell of the grid)" },
+    { "type": "text", "id": "cta_title", "label": "Title", "default": "Share your look" },
+    { "type": "text", "id": "cta_text", "label": "Text", "default": "Tag us for a chance to be featured right here." },
+    { "type": "range", "id": "columns", "label": "Columns (desktop)", "min": 3, "max": 7, "step": 1, "default": 5 },
+    { "type": "color", "id": "bg_color", "label": "Section background", "default": "#FFFFFF" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "photo",
+      "name": "Photo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "url", "id": "link", "label": "Link (to the Instagram post, optional)" }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "BB — Community gallery",
+      "blocks": [
+        { "type": "photo" },
+        { "type": "photo" },
+        { "type": "photo" },
+        { "type": "photo" },
+        { "type": "photo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

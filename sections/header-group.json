@@ -1,0 +1,52 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "bb_announcement": {
+      "type": "bb-announcement-bar",
+      "settings": {
+        "bb_show_announcement": true,
+        "bb_announcement_text": "Handmade with love | Premium quality | Free shipping over €100 | Shipping across Europe",
+        "bb_announcement_rotate": false
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "menu_color_scheme": "scheme-1",
+        "logo_position": "middle-left",
+        "bb_tagline": "",
+        "menu": "main-menu",
+        "menu_type_desktop": "dropdown",
+        "bb_nav_1_label": "Home",
+        "bb_nav_1_url": "/",
+        "bb_nav_2_label": "Products",
+        "bb_nav_2_url": "/collections/all",
+        "bb_nav_3_label": "Contact",
+        "bb_nav_3_url": "/pages/contact",
+        "sticky_header_type": "always",
+        "show_line_separator": true,
+        "enable_country_selector": true,
+        "enable_language_selector": true,
+        "mobile_logo_position": "center",
+        "margin_bottom": 0,
+        "padding_top": 20,
+        "padding_bottom": 20
+      }
+    }
+  },
+  "order": [
+    "bb_announcement",
+    "header"
+  ]
+}

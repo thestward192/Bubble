@@ -1,0 +1,257 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+  }
+  #shopify-section-{{ section.id }} .bb-kits__head .bb-h2 { font-size: {{ section.settings.heading_size }}px; }
+  #shopify-section-{{ section.id }} .bb-kits__head .bb-lead { font-size: {{ section.settings.body_size }}px; }
+
+  /* the featured kit pops up out of the row — an easy asymmetry win */
+  #shopify-section-{{ section.id }} .bb-kits__grid { align-items: start; }
+  #shopify-section-{{ section.id }} .bb-kits__grid > .bb-kit { height: auto; }
+  #shopify-section-{{ section.id }} .bb-kit { position: relative; transition: transform 0.4s var(--bb-ease), box-shadow 0.4s var(--bb-ease); }
+  #shopify-section-{{ section.id }} .bb-kit--featured { transform: translateY(-16px); }
+  #shopify-section-{{ section.id }} .bb-kit:hover { transform: translateY(-22px); }
+  #shopify-section-{{ section.id }} .bb-kit--featured:hover { transform: translateY(-30px); }
+
+  /* media sits in a non-clipping frame so the price tag can hang off the seam */
+  #shopify-section-{{ section.id }} .bb-kit__media-frame { position: relative; }
+
+  #shopify-section-{{ section.id }} .bb-kit__ribbon {
+    position: absolute;
+    top: 17px;
+    left: -36px;
+    z-index: 1;
+    width: 150px;
+    padding: 5px 0;
+    background: var(--bb-primary);
+    color: #ffffff;
+    font: 700 10px/1.5 var(--bb-sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+    transform: rotate(-45deg);
+    box-shadow: 0 8px 16px -6px rgba(46, 39, 67, 0.4);
+  }
+  #shopify-section-{{ section.id }} .bb-kit--featured .bb-kit__ribbon { background: #C9A96A; }
+
+  #shopify-section-{{ section.id }} .bb-kit__tag {
+    position: absolute;
+    right: 22px;
+    bottom: -18px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--bb-line);
+    border-radius: 10px;
+    padding: 9px 16px;
+    font-family: var(--bb-serif);
+    font-weight: 600;
+    font-size: clamp(18px, 1.7vw, 22px);
+    color: var(--bb-ink);
+    box-shadow: var(--bb-shadow-sm);
+    transform: rotate(-5deg);
+    transition: transform 0.4s var(--bb-ease), box-shadow 0.4s var(--bb-ease);
+  }
+  #shopify-section-{{ section.id }} .bb-kit__tag::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: 16px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 2px solid var(--bb-line);
+    background: #ffffff;
+  }
+  #shopify-section-{{ section.id }} .bb-kit:hover .bb-kit__tag {
+    transform: rotate(-1deg) translateY(-2px);
+    box-shadow: var(--bb-shadow);
+  }
+  #shopify-section-{{ section.id }} .bb-kit--featured .bb-kit__tag { border-color: rgba(201, 169, 106, 0.5); }
+
+  #shopify-section-{{ section.id }} .bb-kit__body { padding-top: clamp(26px, 3vw, 40px); }
+  #shopify-section-{{ section.id }} .bb-kit__foot { justify-content: flex-start; }
+  #shopify-section-{{ section.id }} .bb-kit__add { width: 100%; text-align: center; justify-content: center; }
+
+  /* Phone/tablet: a stacked single column hid the fact that there's more than
+     one kit — swap it for a swipeable horizontal rail instead, with the next
+     card peeking in from the right so it reads as "swipe me" at a glance. */
+  @media (max-width: 900px) {
+    #shopify-section-{{ section.id }} .bb-kits__head .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.72 | round }}px; }
+    #shopify-section-{{ section.id }} .bb-kit--featured { transform: none; }
+    #shopify-section-{{ section.id }} .bb-kit--featured:hover { transform: translateY(-8px); }
+
+    #shopify-section-{{ section.id }} .bb-kits__grid {
+      display: flex;
+      grid-template-columns: none;
+      max-width: none;
+      margin: 0;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-left: 4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      gap: 14px;
+      /* extra right padding — without it, the LAST card can't scroll far
+         enough to snap flush left, so a sliver of the previous card stays
+         permanently visible/"cut off" at the edge. */
+      padding: 6px 22% 14px 4px;
+    }
+    #shopify-section-{{ section.id }} .bb-kits__grid::-webkit-scrollbar { display: none; }
+    #shopify-section-{{ section.id }} .bb-kit {
+      flex: 0 0 80%;
+      scroll-snap-align: start;
+    }
+
+    /* the desktop card leans on two rotated, overlapping decorations (the
+       diagonal ribbon + the tilted hanging tag) to feel playful in a wide
+       3-up row — at carousel size, side by side, that reads as cluttered
+       rather than playful, so flatten the tag and tone the ribbon down. */
+    #shopify-section-{{ section.id }} .bb-kit__tag {
+      transform: none;
+      right: 16px;
+      bottom: -16px;
+    }
+    #shopify-section-{{ section.id }} .bb-kit:hover .bb-kit__tag,
+    #shopify-section-{{ section.id }} .bb-kit__tag::before { transform: none; }
+    #shopify-section-{{ section.id }} .bb-kit__ribbon {
+      top: 14px;
+      left: -34px;
+      width: 130px;
+      box-shadow: 0 6px 12px -6px rgba(46, 39, 67, 0.35);
+    }
+  }
+
+  /* Phone: the corner ribbon and hanging price tag (sized for a 3-up desktop
+     grid) felt heavy and cramped next to the text at this width, so trim them
+     down to fit; the rail card also peeks a bit more (less of the next card
+     showing) since the screen itself is narrower. */
+  @media (max-width: 480px) {
+    #shopify-section-{{ section.id }} .bb-kit { flex-basis: 84%; }
+    #shopify-section-{{ section.id }} .bb-kits__grid { padding-right: 16%; }
+    #shopify-section-{{ section.id }} .bb-kits__head { margin-bottom: 22px; }
+    #shopify-section-{{ section.id }} .bb-kits__head .bb-lead { font-size: 13.5px; }
+    #shopify-section-{{ section.id }} .bb-kit__ribbon {
+      width: 120px;
+      top: 13px;
+      left: -32px;
+      font-size: 9px;
+      padding: 4px 0;
+    }
+    #shopify-section-{{ section.id }} .bb-kit__tag {
+      right: 16px;
+      bottom: -14px;
+      padding: 7px 13px;
+      font-size: 17px;
+    }
+    #shopify-section-{{ section.id }} .bb-kit__body { padding-top: 22px; gap: 5px; }
+    #shopify-section-{{ section.id }} .bb-kit__name { font-size: 18px; }
+    #shopify-section-{{ section.id }} .bb-kit__feats { gap: 8px; margin-top: 4px; }
+    #shopify-section-{{ section.id }} .bb-kit__feats li { font-size: 13px; }
+    #shopify-section-{{ section.id }} .bb-kit__foot { padding-top: 16px; }
+    #shopify-section-{{ section.id }} .bb-kit__add { padding: 11px 20px; font-size: 13.5px; }
+  }
+{% endstyle %}
+
+<section class="bb-kits bb-section">
+  <div class="bb-container">
+    <div class="bb-kits__head bb-reveal">
+      <h2 class="bb-h2">{{ section.settings.heading }}</h2>
+      {%- if section.settings.subheading != blank -%}
+        <p class="bb-lead">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="bb-kits__grid">
+      {%- for block in section.blocks -%}
+        <article class="bb-kit bb-reveal{% if block.settings.highlight %} bb-kit--featured{% endif %}" {{ block.shopify_attributes }}>
+          <div class="bb-kit__media-frame">
+            <div class="bb-kit__media">
+              {% render 'bb-image', image: block.settings.image, label: block.settings.name, width: 700, fallback: block.settings.demo_image %}
+              {%- if block.settings.flag != blank -%}<span class="bb-kit__ribbon">{{ block.settings.flag }}</span>{%- endif -%}
+            </div>
+            {%- if block.settings.price != blank -%}<span class="bb-kit__tag">{{ block.settings.price }}</span>{%- endif -%}
+          </div>
+          <div class="bb-kit__body">
+            <h3 class="bb-kit__name">{{ block.settings.name }}</h3>
+            {%- if block.settings.subtitle != blank -%}<p class="bb-kit__sub">{{ block.settings.subtitle }}</p>{%- endif -%}
+
+            {%- assign feats = block.settings.features | newline_to_br | split: '<br />' -%}
+            {%- if feats.size > 0 -%}
+              <ul class="bb-kit__feats">
+                {%- for f in feats -%}
+                  {%- assign fc = f | strip -%}
+                  {%- if fc != blank -%}
+                    <li>
+                      <svg class="bb-kit__check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.4l3.1 3L13 4.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <span>{{ fc }}</span>
+                    </li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+
+            <div class="bb-kit__foot">
+              {%- if block.settings.button_label != blank -%}
+                <a class="bb-btn {% if block.settings.highlight %}bb-btn--gold{% else %}bb-btn--ghost{% endif %} bb-kit__add" href="{{ block.settings.button_link | default: '#' }}">{{ block.settings.button_label }}</a>
+              {%- endif -%}
+            </div>
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "BB — Bangle boxes",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Bangle Boxes & Kits" },
+    { "type": "text", "id": "subheading", "label": "Sub-heading", "default": "Pick your kit and get pieces hand-selected by our team." },
+    { "type": "range", "id": "heading_size", "label": "Heading size (px)", "min": 20, "max": 64, "step": 2, "unit": "px", "default": 38 },
+    { "type": "range", "id": "body_size", "label": "Sub-heading size (px)", "min": 12, "max": 24, "step": 1, "unit": "px", "default": 15 },
+    { "type": "color", "id": "bg_color", "label": "Section background", "default": "#FFFFFF" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "box",
+      "name": "Kit",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "demo_image", "label": "Demo image file (until you pick your own)", "default": "bb-coll-2.jpg" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Kit" },
+        { "type": "text", "id": "subtitle", "label": "Small subtitle", "default": "3 selected pieces" },
+        { "type": "textarea", "id": "features", "label": "Features (one per line)", "default": "3 matching bracelets or hoops\nCurated surprise design\nGift box included" },
+        { "type": "text", "id": "price", "label": "Price (shown as a hanging tag)", "default": "€29.90" },
+        { "type": "text", "id": "flag", "label": "Corner ribbon text (optional)" },
+        { "type": "checkbox", "id": "highlight", "label": "Highlight this card (raises it up, gold accents)", "default": false },
+        { "type": "text", "id": "button_label", "label": "Button text", "default": "Add" },
+        { "type": "url", "id": "button_link", "label": "Button link" }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "BB — Bangle boxes",
+      "blocks": [
+        { "type": "box", "settings": { "name": "Basic Kit", "subtitle": "3 selected pieces", "features": "3 matching bracelets or hoops\nCurated surprise design\nGift box included", "price": "€29.90", "demo_image": "bb-coll-2.jpg" } },
+        { "type": "box", "settings": { "name": "Premium Kit", "subtitle": "6 pieces + special add-on", "features": "6 seasonal pieces\n1 exclusive accessory\nLuxury packaging\nPersonalised card", "price": "€52.00", "flag": "Most popular", "highlight": true, "demo_image": "bb-coll-4.jpg" } },
+        { "type": "box", "settings": { "name": "Mystery Box", "subtitle": "10 collectible pieces", "features": "10 exclusive pieces\nLimited-edition collectibles\nFully coordinated look\nPremium XL packaging", "price": "€79.90", "demo_image": "bb-coll-1.jpg" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,352 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__copy .bb-h2 { font-size: {{ section.settings.heading_size }}px; }
+  #shopify-section-{{ section.id }} .bb-livecta__media {
+    min-height: {{ section.settings.media_height }}px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  /* photo zoom + shine sweep on hover — same language as the product cards.
+     Scoped to devices that actually have a mouse: on touch, ":hover" can get
+     "stuck" after a tap (no pointer to move away), leaving the shine frozen
+     mid-sweep over the photo, so phones/tablets just get the plain photo. */
+  @media (hover: hover) and (pointer: fine) {
+    #shopify-section-{{ section.id }} .bb-livecta__media .bb-img,
+    #shopify-section-{{ section.id }} .bb-livecta__media img {
+      transition: transform 0.8s var(--bb-ease);
+    }
+    #shopify-section-{{ section.id }} .bb-livecta__media:hover .bb-img,
+    #shopify-section-{{ section.id }} .bb-livecta__media:hover img {
+      transform: scale(1.045);
+    }
+    #shopify-section-{{ section.id }} .bb-livecta__media::after {
+      content: "";
+      position: absolute;
+      top: -10%;
+      left: 0;
+      width: 45%;
+      height: 120%;
+      background: linear-gradient(
+        115deg,
+        transparent 15%,
+        rgba(255, 255, 255, 0.04) 35%,
+        rgba(255, 255, 255, 0.65) 50%,
+        rgba(255, 255, 255, 0.04) 65%,
+        transparent 85%
+      );
+      transform: translateX(-160%) skewX(-16deg);
+      pointer-events: none;
+      z-index: 2;
+      transition: transform 0.8s var(--bb-ease);
+    }
+    #shopify-section-{{ section.id }} .bb-livecta__media:hover::after {
+      transform: translateX(260%) skewX(-16deg);
+    }
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__flag { position: absolute; z-index: 3; }
+  @media (prefers-reduced-motion: reduce) {
+    #shopify-section-{{ section.id }} .bb-livecta__media::after { display: none; }
+    #shopify-section-{{ section.id }} .bb-livecta__media:hover .bb-img,
+    #shopify-section-{{ section.id }} .bb-livecta__media:hover img { transform: none; }
+  }
+
+  #shopify-section-{{ section.id }} .bb-livecta__inner {
+    background:
+      radial-gradient(70% 85% at 88% 8%, rgba(248, 222, 236, 0.9), transparent 70%),
+      linear-gradient(135deg, {{ section.settings.panel_color_1 | default: '#EBE0F7' }}, {{ section.settings.panel_color_2 | default: '#E7DFF6' }});
+  }
+
+  /* soft glow echoing the hero, so this panel doesn't feel like an isolated island */
+  #shopify-section-{{ section.id }} .bb-container { position: relative; }
+  #shopify-section-{{ section.id }} .bb-livecta__glow {
+    position: absolute;
+    z-index: -1;
+    width: 60%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__glow--a {
+    top: -12%; right: -8%;
+    background: radial-gradient(circle, #F8DEEC 0%, transparent 70%);
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__glow--b {
+    bottom: -18%; left: -10%;
+    background: radial-gradient(circle, #DCE3FB 0%, transparent 70%);
+  }
+
+  /* ---- schedule disclosure card ---- */
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-btn {
+    position: relative;
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-btn svg {
+    transition: transform 0.3s var(--bb-ease);
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-btn[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-6px);
+    margin-top: 0;
+    transition: max-height 0.45s var(--bb-ease), opacity 0.3s var(--bb-ease), transform 0.4s var(--bb-ease), margin-top 0.45s var(--bb-ease);
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule.is-open {
+    max-height: 480px;
+    opacity: 1;
+    transform: translateY(0);
+    margin-top: 16px;
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-card {
+    background: #ffffff;
+    border: 1px solid var(--bb-line);
+    border-radius: var(--bb-radius-sm);
+    padding: 18px 20px 16px;
+    box-shadow: var(--bb-shadow-sm);
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-title {
+    display: block;
+    font: 600 11px/1 var(--bb-sans);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bb-primary-deep);
+    margin-bottom: 12px;
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid var(--bb-line);
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-row:first-child { border-top: none; padding-top: 0; }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-day {
+    font: 600 13.5px/1.3 var(--bb-sans);
+    color: var(--bb-ink);
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-time {
+    font: 500 13px/1.3 var(--bb-sans);
+    color: var(--bb-ink);
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-platform {
+    font: 400 11.5px/1.3 var(--bb-sans);
+    color: var(--bb-ink-soft);
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font: 600 12.5px/1 var(--bb-sans);
+    color: var(--bb-primary-deep);
+    text-decoration: none;
+  }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-link:hover { color: var(--bb-pink); }
+  #shopify-section-{{ section.id }} .bb-livecta__schedule-link svg { width: 13px; height: 13px; }
+
+  @media (max-width: 900px) {
+    #shopify-section-{{ section.id }} .bb-livecta__media { min-height: {{ section.settings.media_height | times: 0.62 | round }}px; }
+    #shopify-section-{{ section.id }} .bb-livecta__copy .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.8 | round }}px; }
+    #shopify-section-{{ section.id }} .bb-livecta__glow { width: 46%; filter: blur(44px); opacity: 0.4; }
+  }
+  @media (max-width: 480px) {
+    #shopify-section-{{ section.id }} .bb-livecta__media { min-height: {{ section.settings.media_height | times: 0.5 | round }}px; }
+    #shopify-section-{{ section.id }} .bb-livecta__copy .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.66 | round }}px; }
+    #shopify-section-{{ section.id }} .bb-livecta__flag { top: 12px; left: 12px; padding: 6px 11px; font-size: 10px; }
+    #shopify-section-{{ section.id }} .bb-livecta__schedule-card { padding: 16px 16px 14px; }
+    #shopify-section-{{ section.id }} .bb-livecta__schedule-row { flex-wrap: wrap; }
+    #shopify-section-{{ section.id }} .bb-livecta__schedule-meta { align-items: flex-start; }
+  }
+{% endstyle %}
+
+<section class="bb-livecta bb-section">
+  <div class="bb-container">
+    <span class="bb-livecta__glow bb-livecta__glow--a" aria-hidden="true"></span>
+    <span class="bb-livecta__glow bb-livecta__glow--b" aria-hidden="true"></span>
+
+    <div class="bb-livecta__inner bb-reveal{% if section.settings.media_side == 'right' %} bb-livecta__inner--rev{% endif %}">
+      <div class="bb-livecta__media">
+        {% render 'bb-image', image: section.settings.image, label: 'Live shopping', width: 1100, fallback: 'bb-livecta-demo.jpg' %}
+        {%- if section.settings.badge_text != blank -%}
+          <span class="bb-livecta__flag">{{ section.settings.badge_text }}</span>
+        {%- endif -%}
+      </div>
+
+      <div class="bb-livecta__copy">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="bb-eyebrow bb-eyebrow--plain">{{ section.settings.eyebrow }}</span>
+        {%- endif -%}
+        <h2 class="bb-h2">{{ section.settings.heading }}</h2>
+        {%- if section.settings.text != blank -%}
+          <p class="bb-lead">{{ section.settings.text | newline_to_br }}</p>
+        {%- endif -%}
+        <div class="bb-livecta__cta">
+          {%- if section.settings.button_label != blank -%}
+            <a class="bb-btn" href="{{ section.settings.button_link | default: '#' }}">
+              {{ section.settings.button_label }}
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.button_label_2 != blank and section.blocks.size > 0 -%}
+            <button
+              type="button"
+              class="bb-btn bb-btn--ghost bb-livecta__schedule-btn"
+              aria-expanded="false"
+              aria-controls="bb-livecta-schedule-{{ section.id }}"
+              data-bb-live-toggle
+            >
+              {{ section.settings.button_label_2 }}
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+          {%- elsif section.settings.button_label_2 != blank -%}
+            <a class="bb-btn bb-btn--ghost" href="{{ section.settings.button_link_2 | default: '#' }}">{{ section.settings.button_label_2 }}</a>
+          {%- endif -%}
+        </div>
+        {%- if section.settings.note != blank -%}
+          <p class="bb-livecta__note">{{ section.settings.note }}</p>
+        {%- endif -%}
+
+        {%- if section.blocks.size > 0 -%}
+          <div class="bb-livecta__schedule" id="bb-livecta-schedule-{{ section.id }}" data-bb-live-panel aria-hidden="true">
+            <div class="bb-livecta__schedule-card">
+              <span class="bb-livecta__schedule-title">{{ section.settings.schedule_heading | default: "This week's lives" }}</span>
+              <ul class="bb-livecta__schedule-list">
+                {%- for block in section.blocks -%}
+                  <li class="bb-livecta__schedule-row" {{ block.shopify_attributes }}>
+                    <span class="bb-livecta__schedule-day">{{ block.settings.day }}</span>
+                    <span class="bb-livecta__schedule-meta">
+                      <span class="bb-livecta__schedule-time">{{ block.settings.time }}</span>
+                      {%- if block.settings.platform != blank -%}
+                        <span class="bb-livecta__schedule-platform">{{ block.settings.platform }}</span>
+                      {%- endif -%}
+                    </span>
+                  </li>
+                {%- endfor -%}
+              </ul>
+              {%- if section.settings.button_link_2 != blank -%}
+                <a class="bb-livecta__schedule-link" href="{{ section.settings.button_link_2 }}">
+                  {{ section.settings.schedule_link_label | default: 'View full schedule' }}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var SID = {{ section.id | json }};
+    var root = document.getElementById('shopify-section-' + SID);
+    if (!root) return;
+    var toggle = root.querySelector('[data-bb-live-toggle]');
+    var panel = root.querySelector('[data-bb-live-panel]');
+    if (!toggle || !panel) return;
+
+    function setOpen(open) {
+      panel.classList.toggle('is-open', open);
+      panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    function onDocClick(e) {
+      if (panel.contains(e.target) || toggle.contains(e.target)) return;
+      setOpen(false);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    }
+    toggle.addEventListener('click', function () {
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+    document.addEventListener('click', onDocClick);
+    document.addEventListener('keydown', onKey);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "BB — Live shopping CTA",
+  "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "select", "id": "media_side", "label": "Image side", "options": [
+      { "value": "left", "label": "Left" }, { "value": "right", "label": "Right" } ], "default": "left" },
+    { "type": "range", "id": "media_height", "label": "Image height (px)", "min": 240, "max": 620, "step": 10, "unit": "px", "default": 400 },
+    { "type": "text", "id": "badge_text", "label": "Badge on the image", "default": "● LIVE" },
+    { "type": "header", "content": "Text" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Live shopping" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop with us, live." },
+    { "type": "textarea", "id": "text", "label": "Paragraph", "default": "Tune in to our live sessions, see every piece up close, ask anything in the chat and grab the drops before they sell out." },
+    { "type": "text", "id": "note", "label": "Small note under the buttons", "default": "New lives every week · Replays saved to Highlights" },
+    { "type": "range", "id": "heading_size", "label": "Heading size (px)", "min": 22, "max": 56, "step": 2, "unit": "px", "default": 38 },
+    { "type": "header", "content": "Buttons" },
+    { "type": "text", "id": "button_label", "label": "Primary button text", "default": "Join Our Live" },
+    { "type": "url", "id": "button_link", "label": "Primary button link" },
+    { "type": "text", "id": "button_label_2", "label": "Second button text", "default": "See the schedule", "info": "Add \"Live slot\" blocks below and this becomes a button that opens a schedule card — no link needed." },
+    { "type": "header", "content": "Schedule card", "info": "Only shown when there is at least one \"Live slot\" block below." },
+    { "type": "text", "id": "schedule_heading", "label": "Card title", "default": "This week's lives" },
+    { "type": "url", "id": "button_link_2", "label": "\"View full schedule\" link (optional)", "info": "Shown as a link at the bottom of the card." },
+    { "type": "text", "id": "schedule_link_label", "label": "\"View full schedule\" link text", "default": "View full schedule" },
+    { "type": "header", "content": "Colours & spacing" },
+    { "type": "color", "id": "panel_color_1", "label": "Panel colour 1", "default": "#EBE0F7" },
+    { "type": "color", "id": "panel_color_2", "label": "Panel colour 2", "default": "#E7DFF6" },
+    { "type": "color", "id": "bg_color", "label": "Section background", "default": "#FFFFFF" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 8 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "slot",
+      "name": "Live slot",
+      "settings": [
+        { "type": "text", "id": "day", "label": "Day", "default": "Fridays" },
+        { "type": "text", "id": "time", "label": "Time", "default": "6:00 PM EST" },
+        { "type": "text", "id": "platform", "label": "Platform (optional)", "default": "Instagram Live" }
+      ]
+    }
+  ],
+  "max_blocks": 7,
+  "presets": [
+    {
+      "name": "BB — Live shopping CTA",
+      "blocks": [
+        { "type": "slot", "settings": { "day": "Wednesdays", "time": "7:00 PM EST", "platform": "Instagram Live" } },
+        { "type": "slot", "settings": { "day": "Fridays", "time": "6:00 PM EST", "platform": "TikTok Live" } },
+        { "type": "slot", "settings": { "day": "Sundays", "time": "3:00 PM EST", "platform": "Instagram Live" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

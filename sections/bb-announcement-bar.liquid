@@ -1,0 +1,41 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{%- if section.settings.bb_show_announcement and section.settings.bb_announcement_text != blank -%}
+  <div class="bb-announce"{% if section.settings.bb_announcement_rotate %} data-bb-announce-rotate{% endif %}>
+    <div class="bb-announce-row">
+      {%- assign bb_ann = section.settings.bb_announcement_text | split: '|' -%}
+      {%- for bb_part in bb_ann -%}
+        <span>{{ bb_part | strip }}</span>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "BB — Announcement bar",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "bb_show_announcement",
+      "label": "Show announcement bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "bb_announcement_text",
+      "label": "Announcement text (separate messages with | )",
+      "default": "Handmade with love | Premium quality | Worldwide shipping"
+    },
+    {
+      "type": "checkbox",
+      "id": "bb_announcement_rotate",
+      "label": "Rotate messages one at a time instead of showing them in a row",
+      "default": false
+    }
+  ],
+  "presets": [ { "name": "BB — Announcement bar" } ]
+}
+{% endschema %}

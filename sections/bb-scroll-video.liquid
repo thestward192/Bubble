@@ -1,0 +1,646 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign scroll_len = section.settings.scroll_length | default: 600
+  assign sprite = section.settings.sprite_url
+  assign cols = section.settings.sprite_cols | default: 10
+  assign rows = section.settings.sprite_rows | default: 6
+  assign fcount = section.settings.frame_count | default: 60
+  assign rw = section.settings.frame_ratio_w | default: 260
+  assign rh = section.settings.frame_ratio_h | default: 464
+  assign bg_w = cols | times: 100
+  assign bg_h = rows | times: 100
+  assign btn_link = section.settings.button_link | default: routes.all_products_collection_url
+  assign fade_b = section.settings.fade_bottom | default: 10
+  assign fade_solid = 100 | minus: fade_b
+  assign fade_half = fade_b | divided_by: 2.0
+  assign fade_mid_pos = 100 | minus: fade_half
+
+  assign locked = false
+  if section.settings.scroll_mode == 'locked'
+    assign locked = true
+  endif
+  assign seg_ms = section.settings.segment_seconds | default: 1.8 | times: 1000 | round
+  assign track_vh = scroll_len
+  assign track_vh_m = scroll_len | times: 0.6 | round
+  if locked
+    assign track_vh = 116
+    assign track_vh_m = 112
+  endif
+
+  assign has_steps = false
+  if section.blocks.size > 0
+    assign has_steps = true
+  endif
+-%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+  }
+
+  #shopify-section-{{ section.id }} .bb-svid { overflow-x: clip; }
+  #shopify-section-{{ section.id }} .bb-svid__track { position: relative; height: {{ track_vh }}vh; }
+  #shopify-section-{{ section.id }} .bb-svid__inner {
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+  }
+  #shopify-section-{{ section.id }} .bb-svid__grid {
+    position: relative;
+    width: 100%;
+    max-width: var(--bb-maxw);
+    margin: 0 auto;
+    padding: 0 clamp(20px, 5vw, 68px);
+    min-height: clamp(540px, 82vh, 860px);
+    display: grid;
+    place-items: center;
+  }
+
+  #shopify-section-{{ section.id }} .bb-svid__stage {
+    grid-area: 1 / 1;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    perspective: 1500px;
+  }
+  #shopify-section-{{ section.id }} .bb-svid__frame {
+    position: relative;
+    height: {{ section.settings.media_height }}px;
+    aspect-ratio: {{ rw }} / {{ rh }};
+    width: auto;
+    max-width: 100%;
+    transform:
+      translateY(calc((var(--bb-svid-progress, 0) - 0.5) * -26px))
+      rotateY(calc(-4deg + var(--bb-svid-progress, 0) * 8deg))
+      rotateX(1deg);
+    transition: transform 0.12s linear;
+    will-change: transform;
+    -webkit-mask-image: linear-gradient(to bottom, #000 {{ fade_solid }}%, rgba(0,0,0,0.55) {{ fade_mid_pos }}%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 {{ fade_solid }}%, rgba(0,0,0,0.55) {{ fade_mid_pos }}%, transparent 100%);
+  }
+  #shopify-section-{{ section.id }} .bb-svid__sprite {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-size: {{ bg_w }}% {{ bg_h }}%;
+    background-position: var(--bb-svid-x, 0%) var(--bb-svid-y, 0%);
+    {% if sprite != blank %}background-image: url("{{ sprite }}");{% endif %}
+  }
+  #shopify-section-{{ section.id }} .bb-svid__sprite--b { opacity: 0; }
+
+  #shopify-section-{{ section.id }} .bb-svid__eyebrow {
+    position: absolute;
+    top: 4%;
+    left: clamp(20px, 5vw, 68px);
+    z-index: 3;
+    margin: 0;
+  }
+  #shopify-section-{{ section.id }} .bb-svid__steps {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+  #shopify-section-{{ section.id }} .bb-svid__step {
+    position: absolute;
+    max-width: min(34ch, 42%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    opacity: 0;
+    transition: opacity 0.7s var(--bb-ease), transform 0.7s var(--bb-ease);
+    pointer-events: none;
+  }
+  #shopify-section-{{ section.id }} .bb-svid__step.is-active { opacity: 1; transform: none; pointer-events: auto; }
+  #shopify-section-{{ section.id }} .bb-svid:not([data-bb-ready]) .bb-svid__step--1 { opacity: 1; transform: none; }
+
+  #shopify-section-{{ section.id }} .bb-svid__step--1 {
+    top: 14%; left: clamp(20px, 5vw, 68px);
+    text-align: left; align-items: flex-start;
+    transform: translateX(-30px);
+  }
+  #shopify-section-{{ section.id }} .bb-svid__step--2 {
+    top: 42%; right: clamp(20px, 5vw, 68px);
+    text-align: right; align-items: flex-end;
+    transform: translateX(30px);
+  }
+  #shopify-section-{{ section.id }} .bb-svid__step--3 {
+    bottom: 15%; left: clamp(40px, 8vw, 120px);
+    text-align: left; align-items: flex-start;
+    transform: translate(-22px, 20px);
+  }
+
+  #shopify-section-{{ section.id }} .bb-svid__copy .bb-h2 { font-size: {{ section.settings.heading_size }}px; line-height: 1.08; }
+  #shopify-section-{{ section.id }} .bb-svid__cta {
+    position: absolute;
+    right: clamp(20px, 5vw, 68px);
+    bottom: 4%;
+    z-index: 3;
+  }
+
+  @media (max-width: 900px) {
+    #shopify-section-{{ section.id }} .bb-svid__track { height: {{ track_vh_m }}vh; }
+    #shopify-section-{{ section.id }} .bb-svid__grid {
+      display: block;
+      min-height: 0;
+      padding: 8px clamp(18px, 6vw, 32px) 0;
+      text-align: center;
+    }
+    #shopify-section-{{ section.id }} .bb-svid__stage { display: block; }
+    #shopify-section-{{ section.id }} .bb-svid__frame {
+      margin: 0 auto;
+      height: {{ section.settings.media_height | times: 0.78 | round }}px;
+      transform: none;
+    }
+    #shopify-section-{{ section.id }} .bb-svid__eyebrow {
+      position: static;
+      display: block;
+      margin: 18px 0 0;
+    }
+    #shopify-section-{{ section.id }} .bb-svid__steps {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      min-height: 9.5em;
+      margin-top: 14px;
+    }
+    #shopify-section-{{ section.id }} .bb-svid__step,
+    #shopify-section-{{ section.id }} .bb-svid__step--1,
+    #shopify-section-{{ section.id }} .bb-svid__step--2,
+    #shopify-section-{{ section.id }} .bb-svid__step--3 {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      max-width: none;
+      top: 0; left: 0; right: 0; bottom: auto;
+      align-items: center;
+      text-align: center;
+      transform: translateY(14px);
+    }
+    #shopify-section-{{ section.id }} .bb-svid__cta {
+      position: static;
+      display: flex;
+      justify-content: center;
+      margin-top: 18px;
+    }
+    #shopify-section-{{ section.id }} .bb-svid__copy .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.78 | round }}px; }
+  }
+  @media (max-width: 480px) {
+    #shopify-section-{{ section.id }} .bb-svid__cta { width: 100%; }
+    #shopify-section-{{ section.id }} .bb-svid__cta .bb-btn { flex: 1 1 100%; justify-content: center; }
+    #shopify-section-{{ section.id }} .bb-svid__copy .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.64 | round }}px; }
+    #shopify-section-{{ section.id }} .bb-svid__steps { min-height: 11em; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #shopify-section-{{ section.id }} .bb-svid__track { height: auto; }
+    #shopify-section-{{ section.id }} .bb-svid__inner { position: static; min-height: 0; padding: clamp(32px, 6vh, 64px) 0; }
+    #shopify-section-{{ section.id }} .bb-svid__frame { transform: none; }
+    #shopify-section-{{ section.id }} .bb-svid__step { transition: none; }
+  }
+{% endstyle %}
+
+<section
+  class="bb-svid bb-section{% if locked %} bb-svid--locked{% endif %}"
+  data-bb-frames="{{ fcount }}"
+  data-bb-cols="{{ cols }}"
+  data-bb-rows="{{ rows }}"
+  data-bb-breaks="{{ section.settings.step_breaks | strip }}"
+  data-bb-mode="{% if locked %}locked{% else %}scrub{% endif %}"
+  data-bb-seg-ms="{{ seg_ms }}">
+  <div class="bb-svid__track">
+    <div class="bb-svid__inner">
+      <div class="bb-svid__blob bb-svid__blob--1" aria-hidden="true"></div>
+      <div class="bb-svid__blob bb-svid__blob--2" aria-hidden="true"></div>
+      <div class="bb-svid__blob bb-svid__blob--3" aria-hidden="true"></div>
+      <div class="bb-svid__grid bb-svid__copy">
+
+        <div class="bb-svid__stage">
+          <div class="bb-svid__frame">
+            <div class="bb-svid__sprite bb-svid__sprite--a" aria-hidden="true"></div>
+            <div class="bb-svid__sprite bb-svid__sprite--b" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="bb-eyebrow bb-eyebrow--plain bb-svid__eyebrow">{{ section.settings.eyebrow }}</span>
+        {%- endif -%}
+
+        <div class="bb-svid__steps">
+          {%- if has_steps -%}
+            {%- for block in section.blocks -%}
+              {%- assign pos = forloop.index0 | modulo: 3 | plus: 1 -%}
+              <div class="bb-svid__step bb-svid__step--{{ pos }}" {{ block.shopify_attributes }}>
+                {%- if block.settings.heading != blank -%}<h2 class="bb-h2">{{ block.settings.heading }}</h2>{%- endif -%}
+                {%- if block.settings.text != blank -%}<p class="bb-lead">{{ block.settings.text | newline_to_br }}</p>{%- endif -%}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            <div class="bb-svid__step bb-svid__step--1">
+              {%- if section.settings.heading != blank -%}<h2 class="bb-h2">{{ section.settings.heading }}</h2>{%- endif -%}
+              {%- if section.settings.text != blank -%}<p class="bb-lead">{{ section.settings.text | newline_to_br }}</p>{%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.button_label != blank -%}
+          <div class="bb-svid__cta">
+            <a class="bb-btn" href="{{ btn_link }}">
+              {{ section.settings.button_label }}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var SID = {{ section.id | json }};
+    var root = document.getElementById('shopify-section-' + SID);
+    if (!root) return;
+    var section = root.querySelector('.bb-svid');
+    if (!section || section.dataset.bbSvidInit === '1') return;
+    section.dataset.bbSvidInit = '1';
+
+    var track = section.querySelector('.bb-svid__track');
+    var frame = section.querySelector('.bb-svid__frame');
+    var layerA = section.querySelector('.bb-svid__sprite--a');
+    var layerB = section.querySelector('.bb-svid__sprite--b');
+    var steps = section.querySelectorAll('.bb-svid__step');
+    if (!track || !frame) return;
+
+    var FC = Math.max(1, parseInt(section.dataset.bbFrames, 10) || 60);
+    var COLS = Math.max(1, parseInt(section.dataset.bbCols, 10) || 10);
+    var ROWS = Math.max(1, parseInt(section.dataset.bbRows, 10) || 6);
+    var NS = steps.length || 1;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var breaks = (section.dataset.bbBreaks || '').split(',')
+      .map(function (x) { return parseFloat(x); })
+      .filter(function (x) { return !isNaN(x) && x > 0 && x < 1; });
+
+    function stepIndex(p) {
+      if (breaks.length === NS - 1) {
+        for (var k = 0; k < breaks.length; k++) {
+          if (p < breaks[k]) return k;
+        }
+        return NS - 1;
+      }
+      return Math.max(0, Math.min(NS - 1, Math.floor(p * NS)));
+    }
+
+    function cellPos(i) {
+      var c = i % COLS;
+      var r = (i - c) / COLS;
+      return {
+        x: COLS > 1 ? (c / (COLS - 1)) * 100 : 0,
+        y: ROWS > 1 ? (r / (ROWS - 1)) * 100 : 0
+      };
+    }
+    function setLayer(el, i) {
+      if (!el) return;
+      var p = cellPos(i);
+      el.style.setProperty('--bb-svid-x', p.x + '%');
+      el.style.setProperty('--bb-svid-y', p.y + '%');
+    }
+
+    function paint(progress) {
+      var scaled = progress * (FC - 1);
+      var i = Math.max(0, Math.min(FC - 1, Math.floor(scaled)));
+      var next = Math.min(FC - 1, i + 1);
+      var local = scaled - i;
+      setLayer(layerA, i);
+      setLayer(layerB, next);
+      if (layerB) layerB.style.opacity = local;
+      section.style.setProperty('--bb-svid-progress', progress.toFixed(4));
+
+      var si = stepIndex(progress);
+      for (var s = 0; s < steps.length; s++) {
+        steps[s].classList.toggle('is-active', s === si);
+      }
+    }
+
+    function currentProgress() {
+      var rect = track.getBoundingClientRect();
+      var dist = track.offsetHeight - window.innerHeight;
+      if (dist <= 0) return 0;
+      var scrolled = Math.min(Math.max(-rect.top, 0), dist);
+      return scrolled / dist;
+    }
+
+    /* ---- shared setup ---- */
+    section.setAttribute('data-bb-ready', '');
+    if (steps.length && !section.querySelector('.bb-svid__step.is-active')) {
+      steps[0].classList.add('is-active');
+    }
+
+    var spriteUrl = getComputedStyle(layerA).backgroundImage.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+    function preloadSprite(cb) {
+      if (spriteUrl && spriteUrl !== 'none') {
+        var pre = new Image();
+        pre.onload = cb;
+        pre.onerror = cb;
+        pre.src = spriteUrl;
+      } else { cb(); }
+    }
+
+    var mode = section.dataset.bbMode || 'scrub';
+
+    /* ================= SCRUB MODE (progress follows scroll, smoothed) ======= */
+    if (mode !== 'locked' || reduce) {
+      var shownP = currentProgress();
+      var targetP = shownP;
+      var smoothing = false;
+      paint(reduce ? 0 : shownP);
+      if (reduce) return;
+
+      function smoothTick() {
+        var diff = targetP - shownP;
+        if (Math.abs(diff) < 0.0006) {
+          shownP = targetP;
+          paint(shownP);
+          smoothing = false;
+          return;
+        }
+        shownP += diff * 0.16;
+        paint(shownP);
+        requestAnimationFrame(smoothTick);
+      }
+      function onScroll() {
+        targetP = currentProgress();
+        if (!smoothing) { smoothing = true; requestAnimationFrame(smoothTick); }
+      }
+
+      /* Only listen to scroll while the track is anywhere near the viewport —
+         otherwise this section keeps forcing a layout read on every scroll
+         event for the rest of the page, which makes scrolling feel janky
+         and "too sensitive" long after you've scrolled past it. */
+      var scrollBound = false;
+      function bindScroll() {
+        if (scrollBound) return;
+        scrollBound = true;
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      }
+      function unbindScroll() {
+        if (!scrollBound) return;
+        scrollBound = false;
+        window.removeEventListener('scroll', onScroll, { passive: true });
+      }
+
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          if (entries[entries.length - 1].isIntersecting) bindScroll();
+          else unbindScroll();
+        }, { rootMargin: '50% 0px 50% 0px' });
+        io.observe(track);
+      } else {
+        bindScroll();
+      }
+      window.addEventListener('resize', onScroll, { passive: true });
+      preloadSprite(onScroll);
+      return;
+    }
+
+    /* ================= LOCKED MODE (one gesture = one segment) ============= */
+    var SEG_MS = Math.max(400, parseInt(section.dataset.bbSegMs, 10) || 1800);
+    // Two segments: start -> (first text change) -> end. Later text changes
+    // happen on their own while the second segment plays.
+    var midStop = breaks.length ? breaks[0] : 0.5;
+    var stops = [0, midStop, 1];
+    var releaseGuardUntil = 0;
+
+    var prog = 0;
+    var st = 'idle';                 // idle | anim | hold | done
+    var engaged = false;
+    var rafId = 0;
+    var animFrom = 0, animTo = 0, animT0 = 0;
+    var cooldownUntil = 0;
+    var pendingDir = 0;
+    var accum = 0, accumTimer = 0;
+    var lastScrollY = window.pageYOffset;
+    var touchY = 0;
+
+    function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+    function nextStop(from, dir) {
+      var i;
+      if (dir > 0) {
+        for (i = 0; i < stops.length; i++) { if (stops[i] > from + 1e-4) return stops[i]; }
+        return 1;
+      }
+      for (i = stops.length - 1; i >= 0; i--) { if (stops[i] < from - 1e-4) return stops[i]; }
+      return 0;
+    }
+
+    function pinStart() {
+      return Math.round(track.getBoundingClientRect().top + window.pageYOffset);
+    }
+    function pinRange() {
+      return Math.max(0, track.offsetHeight - window.innerHeight);
+    }
+    function pinY() { return pinStart(); }
+
+    function frameTick() {
+      var t = Math.min(1, (performance.now() - animT0) / SEG_MS);
+      prog = animFrom + (animTo - animFrom) * easeInOut(t);
+      paint(prog);
+      if (engaged) window.scrollTo(0, pinY());
+      if (t < 1) return;
+      window.clearInterval(rafId);
+      rafId = 0;
+      prog = animTo;
+      paint(prog);
+      cooldownUntil = performance.now() + 200;
+      if (prog >= 1 - 1e-4) { st = 'done'; pendingDir = 0; release(1); }
+      else if (prog <= 1e-4) { st = 'idle'; pendingDir = 0; release(-1); }
+      else {
+        st = 'hold';
+        if (pendingDir) {
+          var d = pendingDir; pendingDir = 0;
+          window.setTimeout(function () { if (st === 'hold') intent(d); }, 210);
+        }
+      }
+    }
+
+    function playSegment(dir) {
+      if (st === 'anim') return;
+      var to = nextStop(prog, dir);
+      if (Math.abs(to - prog) < 1e-4) { release(dir); return; }
+      animFrom = prog;
+      animTo = to;
+      animT0 = performance.now();
+      st = 'anim';
+      window.clearInterval(rafId);
+      rafId = window.setInterval(frameTick, 16);
+    }
+
+    function engage() {
+      if (engaged) return;
+      engaged = true;
+      st = prog <= 1e-4 ? 'idle' : (prog >= 1 - 1e-4 ? 'done' : 'hold');
+      window.scrollTo(0, pinY());
+      window.addEventListener('wheel', onWheel, { passive: false });
+      window.addEventListener('touchstart', onTouchStart, { passive: true });
+      window.addEventListener('touchmove', onTouchMove, { passive: false });
+      window.addEventListener('keydown', onKey, false);
+    }
+
+    function release(dir) {
+      if (!engaged) return;
+      engaged = false;
+      window.removeEventListener('wheel', onWheel, { passive: false });
+      window.removeEventListener('touchstart', onTouchStart, { passive: true });
+      window.removeEventListener('touchmove', onTouchMove, { passive: false });
+      window.removeEventListener('keydown', onKey, false);
+      // hop just clear of the pinned range so normal scrolling resumes cleanly
+      if (dir > 0) window.scrollTo(0, pinStart() + pinRange() + 4);
+      else if (dir < 0) window.scrollTo(0, Math.max(0, pinStart() - 4));
+      lastScrollY = window.pageYOffset;
+      releaseGuardUntil = performance.now() + 260;
+    }
+
+    function intent(dir) {
+      if (st === 'anim') return;
+      if (performance.now() < cooldownUntil) { pendingDir = dir; return; }
+      if (dir > 0 && prog >= 1 - 1e-4) { release(1); return; }
+      if (dir < 0 && prog <= 1e-4) { release(-1); return; }
+      playSegment(dir);
+    }
+
+    function onWheel(e) {
+      if (!engaged) return;
+      e.preventDefault();
+      if (st === 'anim' || performance.now() < cooldownUntil) return;
+      if ((accum > 0) !== (e.deltaY > 0)) accum = 0;
+      accum += e.deltaY;
+      window.clearTimeout(accumTimer);
+      accumTimer = window.setTimeout(function () { accum = 0; }, 220);
+      if (Math.abs(accum) < 24) return;
+      var dir = accum > 0 ? 1 : -1;
+      accum = 0;
+      intent(dir);
+    }
+
+    function onTouchStart(e) {
+      if (e.touches && e.touches.length) touchY = e.touches[0].clientY;
+    }
+    function onTouchMove(e) {
+      if (!engaged) return;
+      e.preventDefault();
+      if (st === 'anim' || performance.now() < cooldownUntil) return;
+      var y = e.touches && e.touches.length ? e.touches[0].clientY : touchY;
+      var dy = touchY - y;
+      if (Math.abs(dy) < 26) return;
+      touchY = y;
+      intent(dy > 0 ? 1 : -1);
+    }
+
+    function onKey(e) {
+      if (!engaged) return;
+      var k = e.key;
+      if (k === 'Escape') { release(prog >= 0.5 ? 1 : -1); return; }
+      if (k === 'ArrowDown' || k === 'PageDown' || k === ' ' || k === 'Spacebar') { e.preventDefault(); intent(1); }
+      else if (k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); intent(-1); }
+      else if (k === 'Home') { release(-1); }
+      else if (k === 'End') { prog = 1; paint(1); st = 'done'; release(1); }
+    }
+
+    function watch() {
+      var innerTop0 = section.querySelector('.bb-svid__inner').getBoundingClientRect().top;
+      if (engaged) {
+        // if something else scrolled us off the pin (find-in-page, anchor jump…), let go
+        if (st !== 'anim' && Math.abs(innerTop0) > 80) release(innerTop0 < 0 ? 1 : -1);
+        return;
+      }
+      var sr = section.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var y = window.pageYOffset;
+      var dir = y > lastScrollY ? 1 : (y < lastScrollY ? -1 : 0);
+      lastScrollY = y;
+      // reset when still approaching from above; complete when scrolled past
+      if (innerTop0 > 2 && sr.top > 4) { if (prog !== 0) { prog = 0; paint(0); } st = 'idle'; }
+      else if (sr.bottom < vh * 0.9) { if (prog !== 1) { prog = 1; paint(1); } st = 'done'; }
+      // engage once the pinned frame reaches the top and there is travel left
+      if (performance.now() < releaseGuardUntil) return;
+      if (innerTop0 <= 1 && sr.bottom > vh * 0.6) {
+        if (dir >= 0 && prog < 1 - 1e-4) engage();
+        else if (dir < 0 && prog > 1e-4) engage();
+      }
+    }
+
+    paint(0);
+    preloadSprite(function () { paint(prog); });
+    window.addEventListener('scroll', watch, { passive: true });
+    window.addEventListener('resize', function () { if (engaged) window.scrollTo(0, pinY()); }, { passive: true });
+    watch();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "BB — Scroll video",
+  "tag": "section",
+  "settings": [
+    { "type": "paragraph", "content": "A cut-out clip that plays frame by frame as the visitor scrolls, pinned in the centre. Three short texts fade in around it — top-left, then right, then bottom-left." },
+    { "type": "text", "id": "sprite_url", "label": "Frames image URL (sprite sheet)", "default": "https://cdn.shopify.com/s/files/1/0771/1565/4198/files/bb-bracelet-sprite-full.webp" },
+    { "type": "number", "id": "frame_count", "label": "Number of frames", "default": 84 },
+    { "type": "range", "id": "sprite_cols", "label": "Sprite columns", "min": 1, "max": 20, "step": 1, "default": 12 },
+    { "type": "range", "id": "sprite_rows", "label": "Sprite rows", "min": 1, "max": 20, "step": 1, "default": 7 },
+    { "type": "number", "id": "frame_ratio_w", "label": "Frame width (ratio)", "default": 360 },
+    { "type": "number", "id": "frame_ratio_h", "label": "Frame height (ratio)", "default": 641 },
+    { "type": "range", "id": "media_height", "label": "Clip height (px)", "min": 300, "max": 640, "step": 10, "unit": "px", "default": 460 },
+    { "type": "range", "id": "fade_bottom", "label": "Fade out the bottom of the clip", "min": 0, "max": 30, "step": 1, "unit": "%", "default": 10, "info": "Softens the hard cut at the wrist / forearm." },
+    { "type": "header", "content": "Scroll behaviour" },
+    { "type": "select", "id": "scroll_mode", "label": "How it plays", "options": [
+      { "value": "scrub", "label": "Free scrub — follows the scroll bar" },
+      { "value": "locked", "label": "Step lock — one scroll plays a segment, then waits" } ], "default": "scrub" },
+    { "type": "range", "id": "segment_seconds", "label": "Segment play time", "min": 0.6, "max": 4, "step": 0.1, "unit": "s", "default": 1.8, "info": "Step-lock mode: how long each of the two segments takes to play out." },
+    { "type": "range", "id": "scroll_length", "label": "Scroll length (free-scrub mode)", "min": 120, "max": 1000, "step": 10, "unit": "vh", "default": 220, "info": "Only used in free-scrub mode." },
+    { "type": "text", "id": "step_breaks", "label": "Text change points", "default": "0.5, 0.8", "info": "Where each text hands over, as fractions 0–1. \"0.5, 0.8\" = text 2 at halfway, text 3 at 80%. Leave blank for equal thirds." },
+    { "type": "header", "content": "Text" },
+    { "type": "text", "id": "eyebrow", "label": "Small label (top-left)", "default": "Make it yours" },
+    { "type": "inline_richtext", "id": "heading", "label": "Fallback heading (used only if no steps below)", "default": "Design a bracelet that's <em>only yours</em>." },
+    { "type": "textarea", "id": "text", "label": "Fallback paragraph", "default": "Pick your beads, your charms and your colours — every Bubble Beads bracelet is strung by hand, just for you." },
+    { "type": "range", "id": "heading_size", "label": "Heading size (px)", "min": 22, "max": 52, "step": 2, "unit": "px", "default": 34 },
+    { "type": "header", "content": "Button" },
+    { "type": "text", "id": "button_label", "label": "Button text", "default": "Start customizing" },
+    { "type": "url", "id": "button_link", "label": "Button link", "info": "Defaults to /collections/all when left empty." },
+    { "type": "header", "content": "Colours & spacing" },
+    { "type": "color", "id": "bg_color", "label": "Section background", "default": "#FFFFFF" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 8 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Text step",
+      "settings": [
+        { "type": "inline_richtext", "id": "heading", "label": "Heading (make one part italic for the accent colour)" },
+        { "type": "textarea", "id": "text", "label": "Paragraph" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "BB — Scroll video",
+      "blocks": [
+        { "type": "step", "settings": { "heading": "Design a bracelet that's <em>only yours</em>.", "text": "Pick your beads, your charms, your colours — nothing about it is off the shelf." } },
+        { "type": "step", "settings": { "heading": "Strung by hand, <em>bead by bead</em>.", "text": "Every Bubble Beads piece is put together by a real person and checked twice before it ships." } },
+        { "type": "step", "settings": { "heading": "Made to <em>stack &amp; restack</em>.", "text": "Wear it with the rest of your set today, switch it up tomorrow. It's yours to play with." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

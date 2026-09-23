@@ -1,0 +1,120 @@
+{%- comment -%}
+  Bubble Beads — ambient background layer (site-wide)
+  Soft drifting colour "blobs" + occasional 4-point sparkles ("destellos")
+  that flash in and out at random spots.
+  Fixed, pointer-events:none, sits under the header (z-index 1) and every
+  drawer / modal. Uses only existing --bb-* tokens. Honours reduced-motion.
+{%- endcomment -%}
+
+<style>
+  .bb-ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .bb-ambient__blobs,
+  .bb-ambient__sparks { position: absolute; inset: 0; }
+
+  /* ---- soft colour blobs ------------------------------------------------ */
+  .bb-ambient__blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+    will-change: transform;
+  }
+  .bb-ambient__blob--1 {
+    width: 46vw; height: 46vw; min-width: 340px; min-height: 340px;
+    top: -12vw; left: -8vw;
+    background: radial-gradient(circle at 35% 35%, #C8B6EC, rgba(200,182,236,0) 70%);
+    animation: bb-blob-drift-a 34s var(--bb-ease, ease-in-out) infinite;
+  }
+  .bb-ambient__blob--2 {
+    width: 40vw; height: 40vw; min-width: 300px; min-height: 300px;
+    top: 8vh; right: -12vw;
+    background: radial-gradient(circle at 50% 50%, #F8DEEC, rgba(248,222,236,0) 70%);
+    animation: bb-blob-drift-b 42s var(--bb-ease, ease-in-out) infinite;
+  }
+  .bb-ambient__blob--3 {
+    width: 52vw; height: 52vw; min-width: 360px; min-height: 360px;
+    bottom: -18vw; left: 4vw;
+    background: radial-gradient(circle at 50% 50%, #DCE3FB, rgba(220,227,251,0) 70%);
+    animation: bb-blob-drift-a 48s var(--bb-ease, ease-in-out) infinite reverse;
+  }
+  .bb-ambient__blob--4 {
+    width: 34vw; height: 34vw; min-width: 260px; min-height: 260px;
+    bottom: 2vh; right: 2vw;
+    background: radial-gradient(circle at 50% 50%, #E7DCF7, rgba(231,220,247,0) 70%);
+    animation: bb-blob-drift-b 38s var(--bb-ease, ease-in-out) infinite reverse;
+  }
+
+  @keyframes bb-blob-drift-a {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50%      { transform: translate3d(4%, -5%, 0) scale(1.14); }
+  }
+  @keyframes bb-blob-drift-b {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+    50%      { transform: translate3d(-5%, 4%, 0) scale(0.92); }
+  }
+
+  /* ---- 4-point sparkles ("destellos") ------------------------------- */
+  .bb-ambient__spark {
+    position: absolute;
+    width: calc(var(--s, 320) * 0.1px);
+    height: calc(var(--s, 320) * 0.1px);
+    /* gold — reads on white backgrounds */
+    background: radial-gradient(circle at 50% 50%, #FFF4D2 0%, #F2C14E 40%, #D99A28 70%, rgba(198,138,32,0) 100%);
+    /* thin, long 4-point sparkle */
+    clip-path: polygon(50% 0%, 52% 48%, 100% 50%, 52% 52%, 50% 100%, 48% 52%, 0% 50%, 48% 48%);
+    opacity: 0;
+    will-change: transform, opacity;
+    filter: drop-shadow(0 0 14px rgba(232, 168, 52, 0.75)) drop-shadow(0 0 5px rgba(212, 145, 30, 0.65));
+    animation: bb-spark-flash var(--d, 9s) var(--bb-ease, ease-in-out) var(--delay, 0s) infinite;
+  }
+
+  @keyframes bb-spark-flash {
+    0%,
+    100%  { opacity: 0; transform: scale(0.2) rotate(-12deg); }
+    5%    { opacity: var(--op, 1); transform: scale(1.1) rotate(0deg); }
+    11%   { opacity: calc(var(--op, 1) * 0.7); transform: scale(1) rotate(4deg); }
+    18%   { opacity: calc(var(--op, 1) * 0.28); transform: scale(0.92) rotate(9deg); }
+    24%   { opacity: 0; transform: scale(0.55) rotate(12deg); }
+  }
+
+  @media (max-width: 600px) {
+    .bb-ambient__blob { filter: blur(50px); opacity: 0.5; }
+    .bb-ambient__spark { width: calc(var(--s, 320) * 0.07px); height: calc(var(--s, 320) * 0.07px); }
+    .bb-ambient__spark:nth-child(n+9) { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bb-ambient__blob { animation: none; }
+    .bb-ambient__spark { animation: none; opacity: calc(var(--op, 1) * 0.35); transform: scale(0.92); }
+  }
+</style>
+
+<div class="bb-ambient" aria-hidden="true">
+  <div class="bb-ambient__blobs">
+    <span class="bb-ambient__blob bb-ambient__blob--1"></span>
+    <span class="bb-ambient__blob bb-ambient__blob--2"></span>
+    <span class="bb-ambient__blob bb-ambient__blob--3"></span>
+    <span class="bb-ambient__blob bb-ambient__blob--4"></span>
+  </div>
+
+  <div class="bb-ambient__sparks">
+    {%- assign spark_count = 13 -%}
+    {%- for i in (1..spark_count) -%}
+      {%- assign left = i | times: 57 | modulo: 88 | plus: 6 -%}
+      {%- assign top = i | times: 41 | modulo: 84 | plus: 8 -%}
+      {%- assign size = i | times: 43 | modulo: 300 | plus: 300 -%}
+      {%- assign dur = i | times: 23 | modulo: 55 | plus: 80 -%}
+      {%- assign delay = i | times: 29 | modulo: 190 -%}
+      {%- assign op = i | times: 7 | modulo: 2 | plus: 9 -%}
+      <span class="bb-ambient__spark"
+        style="left:{{ left }}%;top:{{ top }}%;--s:{{ size }};--d:{{ dur | divided_by: 10.0 }}s;--delay:{{ delay | divided_by: 10.0 }}s;--op:{{ op | divided_by: 10.0 }}"></span>
+    {%- endfor -%}
+  </div>
+</div>

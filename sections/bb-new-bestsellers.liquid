@@ -1,0 +1,158 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+  }
+  #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size }}px; }
+
+  #shopify-section-{{ section.id }} .bb-nbs__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(16px, 2vw, 28px);
+  }
+  #shopify-section-{{ section.id }} .bb-nbs__card {
+    position: relative;
+    display: block;
+    aspect-ratio: 5 / 4;
+    border-radius: var(--bb-radius);
+    overflow: hidden;
+    text-decoration: none;
+    box-shadow: var(--bb-shadow-sm);
+    transition: transform 0.4s var(--bb-ease), box-shadow 0.4s var(--bb-ease);
+  }
+  #shopify-section-{{ section.id }} .bb-nbs__card:hover { transform: translateY(-6px); box-shadow: var(--bb-shadow); }
+  #shopify-section-{{ section.id }} .bb-nbs__card .bb-img,
+  #shopify-section-{{ section.id }} .bb-nbs__card img { transition: transform 0.6s var(--bb-ease); }
+  #shopify-section-{{ section.id }} .bb-nbs__card:hover .bb-img,
+  #shopify-section-{{ section.id }} .bb-nbs__card:hover img { transform: scale(1.06); }
+
+  #shopify-section-{{ section.id }} .bb-nbs__veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(46, 39, 67, 0) 34%, rgba(46, 39, 67, 0.18) 58%, rgba(46, 39, 67, 0.72) 100%);
+  }
+  #shopify-section-{{ section.id }} .bb-nbs__body {
+    position: absolute;
+    left: clamp(16px, 2vw, 26px);
+    right: clamp(16px, 2vw, 26px);
+    bottom: clamp(16px, 2vw, 26px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    color: #fff;
+  }
+  #shopify-section-{{ section.id }} .bb-nbs__name {
+    font-family: var(--bb-serif);
+    font-weight: 600;
+    font-size: clamp(20px, 2.2vw, 27px);
+    line-height: 1.12;
+    text-shadow: 0 2px 14px rgba(46, 39, 67, 0.45);
+  }
+  #shopify-section-{{ section.id }} .bb-nbs__sub {
+    margin: 0 0 4px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 2px 10px rgba(46, 39, 67, 0.55);
+  }
+  #shopify-section-{{ section.id }} .bb-nbs__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 6px;
+    padding: 10px 18px;
+    border-radius: var(--bb-radius-pill);
+    background: var(--bb-primary);
+    color: #fff;
+    font: 600 12px/1 var(--bb-sans);
+    letter-spacing: 0.01em;
+    box-shadow: 0 10px 22px -10px rgba(123, 94, 199, 0.7);
+    transition: background 0.25s var(--bb-ease), transform 0.25s var(--bb-ease);
+  }
+  #shopify-section-{{ section.id }} .bb-nbs__btn svg { width: 13px; height: 13px; }
+  #shopify-section-{{ section.id }} .bb-nbs__card:hover .bb-nbs__btn { background: var(--bb-primary-deep); transform: translateY(-2px); }
+
+  @media (max-width: 700px) {
+    #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.76 | round }}px; }
+  }
+  @media (max-width: 640px) {
+    #shopify-section-{{ section.id }} .bb-nbs__grid { grid-template-columns: 1fr; gap: 14px; }
+    #shopify-section-{{ section.id }} .bb-nbs__card { aspect-ratio: 4 / 5; }
+    #shopify-section-{{ section.id }} .bb-nbs__name { font-size: 21px; }
+  }
+{% endstyle %}
+
+<section class="bb-nbs bb-section">
+  <div class="bb-container">
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+      <div class="bb-head bb-reveal">
+        <div class="bb-head__title">
+          {%- if section.settings.eyebrow != blank -%}
+            <span class="bb-eyebrow bb-eyebrow--plain">{{ section.settings.eyebrow }}</span>
+          {%- endif -%}
+          {%- if section.settings.heading != blank -%}<h2 class="bb-h2">{{ section.settings.heading }}</h2>{%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    <div class="bb-nbs__grid">
+      {%- for block in section.blocks -%}
+        <a class="bb-nbs__card bb-reveal" href="{{ block.settings.link | default: '#' }}" {{ block.shopify_attributes }}>
+          {% render 'bb-image', image: block.settings.image, label: block.settings.label, width: 900, fallback: 'bb-demo-2.jpg' %}
+          <span class="bb-nbs__veil"></span>
+          <span class="bb-nbs__body">
+            {%- if block.settings.subtext != blank -%}<span class="bb-nbs__sub">{{ block.settings.subtext }}</span>{%- endif -%}
+            <span class="bb-nbs__name">{{ block.settings.label }}</span>
+            <span class="bb-nbs__btn">
+              {{ block.settings.button_label | default: 'Shop now' }}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "BB — New & Loved",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small label above heading", "default": "Fresh drops" },
+    { "type": "inline_richtext", "id": "heading", "label": "Heading (make one part italic for the accent colour)", "default": "What's <em>new & loved</em>" },
+    { "type": "range", "id": "heading_size", "label": "Heading size (px)", "min": 22, "max": 56, "step": 2, "unit": "px", "default": 36 },
+    { "type": "color", "id": "bg_color", "label": "Section background", "default": "#FFFFFF" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Promo card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "label", "label": "Title", "default": "New In" },
+        { "type": "text", "id": "subtext", "label": "Small subtext" },
+        { "type": "text", "id": "button_label", "label": "Button text", "default": "Shop now" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "max_blocks": 2,
+  "presets": [
+    {
+      "name": "BB — New & Loved",
+      "blocks": [
+        { "type": "card", "settings": { "label": "New In", "subtext": "Discover the latest Bubble Beads arrivals", "button_label": "Shop New In" } },
+        { "type": "card", "settings": { "label": "Best Sellers", "subtext": "Our most loved pieces", "button_label": "Shop Best Sellers" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

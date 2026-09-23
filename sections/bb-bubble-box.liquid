@@ -1,0 +1,265 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign soon_label = section.settings.coming_soon_label | default: 'Coming soon'
+-%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    {% if section.settings.bg_color != blank %}background: {{ section.settings.bg_color }};{% endif %}
+  }
+
+  #shopify-section-{{ section.id }} .bb-bbox { font-family: var(--bb-sans); color: var(--bb-ink); }
+
+  #shopify-section-{{ section.id }} .bb-bbox__head {
+    max-width: 640px;
+    margin: 0 auto 42px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+  }
+  #shopify-section-{{ section.id }} .bb-bbox__head .bb-h2 { font-size: {{ section.settings.heading_size }}px; }
+
+  #shopify-section-{{ section.id }} .bb-bbox__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: clamp(16px, 2.4vw, 26px);
+    align-items: stretch;
+  }
+
+  #shopify-section-{{ section.id }} .bb-bbox__card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--bb-radius);
+    padding: 30px 26px 28px;
+    background: linear-gradient(180deg, #ffffff 0%, #FBF7FE 100%);
+    border: 1px solid var(--bb-line);
+    box-shadow: var(--bb-shadow-sm);
+    overflow: hidden;
+  }
+  #shopify-section-{{ section.id }} .bb-bbox__card--feat {
+    border-color: rgba(201, 169, 106, 0.55);
+    box-shadow: 0 26px 54px -26px rgba(201, 169, 106, 0.5);
+  }
+  #shopify-section-{{ section.id }} .bb-bbox__card--feat::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(120% 90% at 50% 0%, rgba(201, 169, 106, 0.12), transparent 60%);
+  }
+
+  #shopify-section-{{ section.id }} .bb-bbox__badge {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font: 600 10px/1 var(--bb-sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bb-primary-deep);
+    background: rgba(123, 94, 199, 0.10);
+    border-radius: var(--bb-radius-pill);
+    padding: 7px 12px;
+    margin-bottom: 18px;
+  }
+  #shopify-section-{{ section.id }} .bb-bbox__badge::before {
+    content: "";
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff, var(--bb-primary-soft));
+  }
+
+  #shopify-section-{{ section.id }} .bb-bbox__price {
+    font-family: var(--bb-serif);
+    font-weight: 600;
+    font-size: 42px;
+    line-height: 1;
+    color: var(--bb-ink);
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+  }
+  #shopify-section-{{ section.id }} .bb-bbox__price .bb-bbox__cur { font-size: 22px; color: var(--bb-ink-soft); }
+  #shopify-section-{{ section.id }} .bb-bbox__name {
+    margin: 12px 0 4px;
+    font-family: var(--bb-serif);
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--bb-primary-deep);
+  }
+  #shopify-section-{{ section.id }} .bb-bbox__desc {
+    margin: 0 0 18px;
+    color: var(--bb-ink-soft);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  #shopify-section-{{ section.id }} .bb-bbox__list {
+    list-style: none;
+    margin: 0 0 24px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  #shopify-section-{{ section.id }} .bb-bbox__list li {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--bb-ink);
+  }
+  #shopify-section-{{ section.id }} .bb-bbox__list svg {
+    flex: 0 0 auto;
+    width: 15px; height: 15px;
+    margin-top: 1px;
+    color: var(--bb-primary);
+  }
+
+  #shopify-section-{{ section.id }} .bb-bbox__soon {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 22px;
+    border-radius: var(--bb-radius-pill);
+    font: 600 12.5px/1 var(--bb-sans);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--bb-ink-soft);
+    background: rgba(123, 94, 199, 0.06);
+    border: 1.5px dashed rgba(123, 94, 199, 0.32);
+  }
+
+  #shopify-section-{{ section.id }} .bb-bbox__cta { margin-top: 36px; text-align: center; }
+  #shopify-section-{{ section.id }} .bb-bbox__note {
+    margin: 16px auto 0;
+    max-width: 460px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--bb-ink-soft);
+  }
+
+  @media (max-width: 640px) {
+    #shopify-section-{{ section.id }} .bb-bbox__card { padding: 24px 20px 22px; }
+    #shopify-section-{{ section.id }} .bb-bbox__price { font-size: 36px; }
+    #shopify-section-{{ section.id }} .bb-bbox__head { margin-bottom: 32px; }
+  }
+{% endstyle %}
+
+<section class="bb-bbox bb-section">
+  <div class="bb-container">
+    <div class="bb-bbox__head bb-reveal">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="bb-eyebrow">{{ section.settings.eyebrow }}</span>
+      {%- endif -%}
+      <h2 class="bb-h2">{{ section.settings.heading }}</h2>
+      {%- if section.settings.subheading != blank -%}
+        <p class="bb-lead">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="bb-bbox__grid">
+      {%- for block in section.blocks -%}
+        {%- assign is_feat = forloop.index | modulo: 2 -%}
+        <article class="bb-bbox__card bb-reveal{% if is_feat == 0 %} bb-bbox__card--feat{% endif %}" {{ block.shopify_attributes }}>
+          <span class="bb-bbox__badge">{{ block.settings.badge | default: soon_label }}</span>
+
+          <div class="bb-bbox__price">
+            <span class="bb-bbox__cur">€</span>{{ block.settings.price }}
+          </div>
+          {%- if block.settings.name != blank -%}
+            <p class="bb-bbox__name">{{ block.settings.name }}</p>
+          {%- endif -%}
+          {%- if block.settings.description != blank -%}
+            <p class="bb-bbox__desc">{{ block.settings.description }}</p>
+          {%- endif -%}
+
+          {%- assign feats = block.settings.features | newline_to_br | split: '<br />' -%}
+          {%- if feats.size > 0 -%}
+            <ul class="bb-bbox__list">
+              {%- for f in feats -%}
+                {%- assign fc = f | strip -%}
+                {%- if fc != blank -%}
+                  <li>
+                    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.4l3.1 3L13 4.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span>{{ fc }}</span>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+
+          <span class="bb-bbox__soon">{{ soon_label }}</span>
+        </article>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.button_label != blank -%}
+      <div class="bb-bbox__cta bb-reveal">
+        <a class="bb-btn bb-btn--gold" href="{{ section.settings.button_link | default: '#' }}">{{ section.settings.button_label }}</a>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.note != blank -%}
+      <p class="bb-bbox__note">{{ section.settings.note }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "BB — Bubble Box",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Coming soon" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Bubble Box" },
+    { "type": "textarea", "id": "subheading", "label": "Sub-heading", "default": "Our curated surprise box, dropping soon. Pick your size — every Bubble Box blends bracelets, hair essentials and styling tools." },
+    { "type": "range", "id": "heading_size", "label": "Heading size (px)", "min": 20, "max": 64, "step": 2, "unit": "px", "default": 40 },
+    { "type": "text", "id": "coming_soon_label", "label": "\"Coming soon\" label on cards", "default": "Coming soon" },
+    { "type": "header", "content": "Call to action (optional)" },
+    { "type": "text", "id": "button_label", "label": "Button text", "info": "Leave empty to hide the button." },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "textarea", "id": "note", "label": "Note under the button", "default": "Join the list and we'll email you the moment Bubble Box goes live." },
+    { "type": "header", "content": "Colours & spacing" },
+    { "type": "color", "id": "bg_color", "label": "Section background", "default": "#FFFFFF" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "tier",
+      "name": "Price tier",
+      "settings": [
+        { "type": "text", "id": "price", "label": "Price (number only, € is added)", "default": "50" },
+        { "type": "text", "id": "name", "label": "Tier name", "default": "The Mini" },
+        { "type": "text", "id": "description", "label": "Short description" },
+        { "type": "textarea", "id": "features", "label": "What's inside (one per line)", "default": "A handful of bracelets\n1–2 hair essentials\nWrapped in a Bubble Box" },
+        { "type": "text", "id": "badge", "label": "Card badge", "default": "Coming soon" }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "BB — Bubble Box",
+      "blocks": [
+        { "type": "tier", "settings": { "price": "50", "name": "The Mini", "description": "A little taste of Bubble Beads.", "features": "A handful of bracelets\n1–2 hair essentials\nWrapped in a Bubble Box" } },
+        { "type": "tier", "settings": { "price": "100", "name": "The Signature", "description": "Our best-balanced box.", "features": "A full bracelet stack\nHair essentials set\n1 styling tool\nGift-ready packaging" } },
+        { "type": "tier", "settings": { "price": "150", "name": "The Full Set", "description": "Everything, all at once.", "features": "Bracelets for every day\nComplete hair essentials kit\nStyling tools\nExclusive extras + card" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

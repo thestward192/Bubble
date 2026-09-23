@@ -1,0 +1,257 @@
+/* ==========================================================================
+   BB — Cart drawer: re-skins Dawn's stock cart-drawer component to match the
+   site's own tokens (colors, radii, fonts) instead of the default theme.
+   Re-using Dawn's own CSS custom properties (scoped to .cart-drawer) means we
+   don't have to fight every individual component rule with !important — the
+   whole drawer, inputs and buttons re-theme from these few variables.
+   ========================================================================== */
+
+.cart-drawer,
+.drawer__inner {
+  --color-background: 255, 255, 255;
+  --color-foreground: 46, 39, 67;
+  --color-shadow: 91, 63, 160;
+  --color-button: 123, 94, 199;
+  --color-button-text: 255, 255, 255;
+  --inputs-radius: 999px;
+  --inputs-radius-outset: 999px;
+  --inputs-border-width: 1px;
+  --inputs-border-opacity: 0.5;
+  --inputs-shadow-opacity: 0;
+  --buttons-radius: 999px;
+  --buttons-radius-outset: 999px;
+  --buttons-border-width: 0px;
+  --buttons-shadow-opacity: 0;
+  font-family: var(--bb-sans);
+}
+
+/* full-screen scrim, tinted with the brand ink instead of flat black */
+.drawer {
+  background-color: rgba(46, 39, 67, 0.42);
+  backdrop-filter: blur(2px);
+}
+
+/* panel shell */
+.drawer__inner {
+  width: 44rem;
+  max-width: calc(100vw - 40px);
+  padding: 0 22px;
+  border: none;
+  border-radius: var(--bb-radius) 0 0 var(--bb-radius);
+  box-shadow: -18px 0 46px -18px rgba(91, 63, 160, 0.32);
+}
+
+.drawer__header {
+  padding: 20px 0 16px;
+  border-bottom: 1px solid var(--bb-line);
+}
+.drawer__heading {
+  font-family: var(--bb-serif);
+  font-weight: 600;
+  font-size: 21px;
+  color: var(--bb-ink);
+  margin: 0;
+}
+.drawer__close {
+  top: 14px;
+  right: -6px;
+  min-width: 38px;
+  min-height: 38px;
+  border-radius: 50%;
+  color: var(--bb-ink-soft);
+  transition: background-color 0.25s var(--bb-ease), color 0.25s var(--bb-ease);
+}
+.drawer__close:hover {
+  background-color: rgba(123, 94, 199, 0.1);
+  color: var(--bb-primary-deep);
+}
+.drawer__close .svg-wrapper { height: 18px; width: 18px; }
+
+/* empty state */
+.drawer__inner-empty { padding: 0 22px; }
+.cart__empty-text {
+  font-family: var(--bb-serif);
+  font-weight: 600;
+  color: var(--bb-ink);
+}
+.cart-drawer__warnings .drawer__close {
+  right: 6px;
+  top: 16px;
+}
+.cart-drawer__empty-content .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 600 14.5px/1 var(--bb-sans);
+  color: var(--bb-primary-deep);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1.5px solid rgba(123, 94, 199, 0.35);
+}
+.cart-drawer__empty-content .button:hover { background: #fff; }
+
+/* item rows: keep the <table> markup (accessibility) but present it as a
+   simple list of cards instead of a literal table grid. */
+.cart-items thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: -1px;
+}
+.cart-items,
+.cart-items tbody,
+.cart-items tr {
+  display: block;
+  width: 100%;
+}
+/* .cart-drawer .cart-items .cart-item(...) — three classes deep on purpose:
+   Dawn's own component-cart-drawer.css re-positions these same elements
+   (.cart-drawer .cart-item__details, .cart-drawer .cart-items .cart-item__quantity, etc.)
+   at specificity up to 0-3-0. Anything less specific here silently loses that
+   fight and Dawn's 4-column grid bleeds through, which is what caused the
+   overlapping title/price/quantity — so every rule below matches or beats it. */
+.cart-drawer .cart-items .cart-item {
+  display: grid;
+  grid-template-columns: 76px 1fr auto;
+  grid-template-areas: "media details totals" "media quantity totals";
+  column-gap: 14px;
+  row-gap: 6px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--bb-line);
+}
+.cart-drawer .cart-items .cart-item td { display: block; padding: 0; border: none; }
+.cart-drawer .cart-items .cart-item__media {
+  grid-area: media;
+  /* Dawn's own component-cart-items.css sets `.cart-item__media { width: 10rem }`
+     from 750px up — a fixed 160px that has nothing to do with our 76px column
+     and was the actual cause of the photo bleeding into the title. Force it
+     back down to the track's real width instead of Dawn's hardcoded one. */
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+.cart-drawer .cart-items .cart-item__totals,
+.cart-drawer .cart-items .cart-item__quantity {
+  min-width: 0;
+}
+.cart-item__image-container {
+  position: relative;
+  border-radius: var(--bb-radius-sm);
+  overflow: hidden;
+  background: #F6F2FB;
+  aspect-ratio: 1;
+}
+.cart-item__image-container .cart-item__image {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+.cart-drawer .cart-items .cart-item__details {
+  grid-area: details;
+  min-width: 0;
+}
+.cart-item__name {
+  font-family: var(--bb-serif);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--bb-ink);
+}
+.cart-item__name:hover { color: var(--bb-primary); }
+.product-option { font-size: 12.5px; color: var(--bb-ink-soft); }
+.cart-drawer .cart-items .cart-item__totals {
+  grid-area: totals;
+  text-align: right;
+  align-self: start;
+  justify-content: flex-end;
+}
+.cart-item__price-wrapper .price {
+  font: 600 14.5px/1 var(--bb-sans);
+  color: var(--bb-ink);
+}
+.cart-item__old-price { color: var(--bb-ink-soft); }
+.cart-drawer .cart-items .cart-item__quantity {
+  grid-area: quantity;
+  align-self: end;
+  padding: 0;
+}
+.cart-item__quantity-wrapper { display: flex; align-items: center; gap: 8px; }
+.quantity {
+  width: auto;
+  min-height: 0;
+  height: 32px;
+  border: 1px solid var(--bb-line);
+  background: #fff;
+}
+.quantity:before,
+.quantity:after { display: none; }
+.quantity__button { width: 30px; font-size: 15px; color: var(--bb-ink); }
+.quantity__input { font: 500 13px/1 var(--bb-sans); width: 34px; padding: 0; }
+.cart-remove-button {
+  min-width: 30px;
+  min-height: 30px;
+  border-radius: 50%;
+  color: var(--bb-ink-soft);
+  background: transparent;
+}
+.cart-remove-button:hover { color: var(--bb-pink); background: rgba(233, 124, 180, 0.1); }
+.cart-remove-button .svg-wrapper { height: 15px; width: 15px; }
+
+/* footer / totals / checkout */
+.drawer__footer {
+  border-top: 1px solid var(--bb-line);
+  padding: 16px 0 20px;
+}
+.drawer__footer summary {
+  font: 500 13.5px/1 var(--bb-sans);
+  color: var(--bb-ink-soft);
+}
+.totals__total {
+  font-family: var(--bb-serif);
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--bb-ink);
+}
+.totals__total-value {
+  font-family: var(--bb-serif);
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--bb-primary-deep);
+}
+.tax-note { color: var(--bb-ink-soft); }
+.cart__ctas { margin-top: 14px; }
+.cart__checkout-button {
+  width: 100%;
+  font: 600 15px/1 var(--bb-sans);
+  letter-spacing: 0.01em;
+  background: var(--bb-primary);
+  color: #fff;
+  box-shadow: 0 14px 26px -12px rgba(123, 94, 199, 0.55);
+  transition: transform 0.3s var(--bb-ease), box-shadow 0.3s var(--bb-ease);
+}
+.cart__checkout-button:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 34px -12px rgba(123, 94, 199, 0.6);
+}
+.cart__checkout-button[disabled] { opacity: 0.5; box-shadow: none; }
+
+@media screen and (max-width: 749px) {
+  .drawer__inner {
+    width: 100vw;
+    max-width: calc(100vw - 22px);
+    padding: 0 16px;
+    border-radius: var(--bb-radius-sm) 0 0 var(--bb-radius-sm);
+    box-shadow: -12px 0 32px -16px rgba(91, 63, 160, 0.32);
+  }
+  .drawer__header { padding: 16px 0 14px; }
+  .drawer__heading { font-size: 18px; }
+  .cart-drawer .cart-items .cart-item {
+    grid-template-columns: 64px 1fr auto;
+    column-gap: 12px;
+    padding: 13px 0;
+  }
+}

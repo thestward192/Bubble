@@ -1,0 +1,174 @@
+{{ 'bb-collection.css' | asset_url | stylesheet_tag }}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'bb-collection.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background: var(--bbc-bg, #faf8ff);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+  #shopify-section-{{ section.id }} .bb-shop-grid__list {
+    grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+  }
+  @media screen and (min-width: 750px) {
+    #shopify-section-{{ section.id }} .bb-shop-grid__list {
+      grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    }
+  }
+{%- endstyle -%}
+
+<div class="bb-shop-grid color-{{ section.settings.color_scheme }}">
+  {%- paginate collection.products by section.settings.products_per_page -%}
+    <div class="bb-shop-grid__layout">
+      {%- if section.settings.enable_filtering or section.settings.enable_sorting -%}
+        <aside class="bb-shop-grid__aside" id="main-collection-filters" data-id="{{ section.id }}" aria-labelledby="verticalTitle">
+          {% render 'facets',
+            results: collection,
+            enable_filtering: section.settings.enable_filtering,
+            enable_sorting: false,
+            filter_type: 'vertical',
+            paginate: paginate
+          %}
+        </aside>
+      {%- endif -%}
+
+      <div class="bb-shop-grid__main">
+        {%- if section.settings.enable_sorting -%}
+          <facet-filters-form class="bb-shop-grid__toolbar">
+            <form id="BbFacetSortForm">
+              <p class="bb-shop-grid__count" role="status">
+                <span id="ProductCountDesktop">
+                  {%- if collection.results_count -%}
+                    {{ 'templates.search.results_with_count' | t: terms: collection.terms, count: collection.results_count }}
+                  {%- else -%}
+                    {{ 'products.facets.product_count_simple' | t: count: collection.products_count }}
+                  {%- endif -%}
+                </span>
+              </p>
+              <div class="bb-shop-grid__sort">
+                <label for="BbSortBy">{{ 'products.facets.sort_by_label' | t }}</label>
+                {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+                <select name="sort_by" class="bb-shop-grid__sort-select" id="BbSortBy">
+                  {%- for option in collection.sort_options -%}
+                    <option value="{{ option.value | escape }}" {% if option.value == sort_by %}selected{% endif %}>
+                      {{ option.name | escape }}
+                    </option>
+                  {%- endfor -%}
+                </select>
+              </div>
+            </form>
+          </facet-filters-form>
+        {%- endif -%}
+
+        <div id="ProductGridContainer">
+          {%- if collection.products.size == 0 -%}
+            <div class="collection bb-shop-grid__empty">
+              <p>{{ 'sections.collection_template.empty' | t }}</p>
+              <a href="{{ collection.url }}" class="bb-btn">
+                {{ 'sections.collection_template.use_fewer_filters_html' | t: link: collection.url, class: '' | strip_html }}
+              </a>
+            </div>
+          {%- else -%}
+            <div class="collection">
+            <ul id="product-grid" data-id="{{ section.id }}" class="bb-shop-grid__list">
+              {%- for product in collection.products -%}
+                {%- assign lazy = true -%}
+                {%- if forloop.index <= 4 -%}{%- assign lazy = false -%}{%- endif -%}
+                <li class="bb-reveal">
+                  {% render 'bb-card-product', card_product: product, lazy_load: lazy %}
+                </li>
+              {%- endfor -%}
+            </ul>
+
+            {%- if paginate.pages > 1 -%}
+              <div class="bb-shop-grid__pagination">
+                {% render 'pagination', paginate: paginate, anchor: '' %}
+              </div>
+            {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  {%- endpaginate -%}
+</div>
+
+{% schema %}
+{
+  "name": "BB – Grid productos",
+  "class": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Productos por página",
+      "min": 8,
+      "max": 36,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columnas en escritorio",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columnas en móvil",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Esquema de color",
+      "default": "scheme-1"
+    },
+    { "type": "header", "content": "Filtros y orden" },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "Activar filtros",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "Activar ordenar por",
+      "default": true
+    },
+    { "type": "header", "content": "Espaciado" },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espacio superior (px)",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espacio inferior (px)",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 80
+    }
+  ]
+}
+{% endschema %}

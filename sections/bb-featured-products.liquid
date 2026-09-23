@@ -1,0 +1,135 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+{{ 'bb-collection.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign fp_collection = section.settings.collection | default: collections.all
+  assign fp_link = fp_collection.url | default: section.settings.view_all_link | default: '#'
+-%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #FDF2F8 0%, {{ section.settings.bg_color | default: '#FFFFFF' }} 48%, #F3EFFB 100%);
+  }
+  #shopify-section-{{ section.id }} .bb-featprod__blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(64px);
+    z-index: 0;
+    pointer-events: none;
+  }
+  #shopify-section-{{ section.id }} .bb-featprod__blob--1 {
+    top: -10%;
+    left: -6%;
+    width: 30vh;
+    height: 30vh;
+    opacity: 0.35;
+    background: radial-gradient(circle, #F2B6DA, transparent 72%);
+  }
+  #shopify-section-{{ section.id }} .bb-featprod__blob--2 {
+    bottom: -14%;
+    right: -6%;
+    width: 34vh;
+    height: 34vh;
+    opacity: 0.3;
+    background: radial-gradient(circle, #C8B6EC, transparent 72%);
+  }
+  #shopify-section-{{ section.id }} .bb-container { position: relative; z-index: 1; }
+
+  #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size }}px; }
+
+  #shopify-section-{{ section.id }} .bb-featprod__grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
+    gap: clamp(16px, 2vw, 28px);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #shopify-section-{{ section.id }} .bb-featprod__empty {
+    margin: 0;
+    padding: 40px 0;
+    text-align: center;
+    color: var(--bb-ink-soft);
+    font-family: var(--bb-sans);
+  }
+
+  @media (max-width: 1100px) {
+    #shopify-section-{{ section.id }} .bb-featprod__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 760px) {
+    #shopify-section-{{ section.id }} .bb-featprod__grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.8 | round }}px; }
+    #shopify-section-{{ section.id }} .bb-featprod__blob--1,
+    #shopify-section-{{ section.id }} .bb-featprod__blob--2 { width: 22vh; height: 22vh; filter: blur(46px); }
+  }
+  @media (max-width: 480px) {
+    #shopify-section-{{ section.id }} .bb-featprod__grid { gap: 11px; }
+    #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.68 | round }}px; }
+  }
+{% endstyle %}
+
+<section class="bb-featprod bb-section">
+  <span class="bb-featprod__blob bb-featprod__blob--1" aria-hidden="true"></span>
+  <span class="bb-featprod__blob bb-featprod__blob--2" aria-hidden="true"></span>
+  <div class="bb-container">
+    <div class="bb-head bb-reveal">
+      <div class="bb-head__title">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="bb-eyebrow bb-eyebrow--plain">{{ section.settings.eyebrow }}</span>
+        {%- endif -%}
+        <h2 class="bb-h2">{{ section.settings.heading }}</h2>
+      </div>
+      {%- if section.settings.view_all_label != blank -%}
+        <a class="bb-btn bb-btn--link bb-featprod__viewall" href="{{ fp_link }}">
+          {{ section.settings.view_all_label }}
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- if fp_collection.products.size > 0 -%}
+      <ul class="bb-featprod__grid">
+        {%- for product in fp_collection.products limit: section.settings.products_to_show -%}
+          {%- assign lazy = true -%}
+          {%- if forloop.index <= 4 -%}{%- assign lazy = false -%}{%- endif -%}
+          <li class="bb-reveal">
+            {% render 'bb-card-product', card_product: product, lazy_load: lazy %}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p class="bb-featprod__empty">{{ 'sections.collection_template.empty' | t }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "BB — Featured products",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow (small label above heading)", "default": "Bestsellers" },
+    { "type": "text", "id": "heading", "label": "Section heading", "default": "Loved Right Now" },
+    { "type": "range", "id": "heading_size", "label": "Heading size (px)", "min": 20, "max": 60, "step": 2, "unit": "px", "default": 32 },
+    { "type": "collection", "id": "collection", "label": "Collection", "info": "Pulls products from this collection. Leave empty to show all products." },
+    { "type": "range", "id": "products_to_show", "label": "Products to show", "min": 3, "max": 12, "step": 1, "default": 4 },
+    { "type": "range", "id": "columns", "label": "Columns (desktop)", "min": 2, "max": 5, "step": 1, "default": 4 },
+    { "type": "text", "id": "view_all_label", "label": "\"View all\" link text", "default": "View all" },
+    { "type": "url", "id": "view_all_link", "label": "\"View all\" link (used only if no collection is set)" },
+    { "type": "color", "id": "bg_color", "label": "Background gradient centre", "info": "Blends from a soft pink corner to this colour to a soft lilac corner.", "default": "#FFFFFF" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "presets": [
+    { "name": "BB — Featured products" }
+  ]
+}
+{% endschema %}

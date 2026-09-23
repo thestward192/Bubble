@@ -1,0 +1,234 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+  #shopify-section-{{ section.id }} .bb-buybox__title { font-size: {{ section.settings.title_size }}px; }
+  #shopify-section-{{ section.id }} .bb-buybox__desc,
+  #shopify-section-{{ section.id }} .bb-feature p { font-size: {{ section.settings.body_size }}px; }
+{% endstyle %}
+
+{%- assign cv = product.selected_or_first_available_variant -%}
+
+<section class="bb-product bb-section">
+  <div class="bb-container">
+    <div class="bb-product__grid">
+
+      {%- comment -%} ---------- Gallery ---------- {%- endcomment -%}
+      <div class="bb-gallery bb-reveal" data-bb-gallery>
+        <div class="bb-gallery__main">
+          {%- if product.featured_media -%}
+            <img class="bb-img" data-bb-gallery-main
+                 src="{{ product.featured_media | image_url: width: 1200 }}"
+                 alt="{{ product.featured_media.alt | escape }}"
+                 width="1200" height="1200" loading="eager" fetchpriority="high">
+          {%- else -%}
+            <span class="bb-ph" role="img" aria-label="Product image placeholder">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l1.9 4.7L18.9 8l-3.6 3.3.9 5L12 13.9 7.8 16.3l.9-5L5.1 8l5-1.3z"/></svg>
+              <em>Product image</em>
+            </span>
+          {%- endif -%}
+        </div>
+        {%- if product.media.size > 1 -%}
+          <div class="bb-gallery__thumbs">
+            {%- for media in product.media -%}
+              <button type="button" class="bb-gallery__thumb{% if forloop.first %} is-active{% endif %}"
+                      data-bb-gallery-thumb data-full="{{ media | image_url: width: 1200 }}"
+                      aria-label="View image {{ forloop.index }}">
+                <img class="bb-img" src="{{ media | image_url: width: 150 }}" alt="{{ media.alt | escape }}" width="72" height="72" loading="lazy">
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} ---------- Buy box ---------- {%- endcomment -%}
+      <div class="bb-buybox bb-reveal"
+           data-bb-variants
+           data-money="{{ shop.money_format | escape }}"
+           data-addtext="{{ section.settings.button_text | escape }}"
+           data-soldout="{{ section.settings.sold_out_text | escape }}">
+
+        {%- if section.settings.eyebrow != blank -%}<span class="bb-eyebrow">{{ section.settings.eyebrow }}</span>{%- endif -%}
+
+        <h1 class="bb-buybox__title">{{ product.title | default: 'Your product name' }}</h1>
+
+        <div class="bb-buybox__price" data-bb-price>
+          {%- if cv.compare_at_price and cv.compare_at_price > cv.price -%}
+            <s>{{ cv.compare_at_price | money }}</s>{{ cv.price | money }}
+            <span class="bb-save">Save {{ cv.compare_at_price | minus: cv.price | times: 100.0 | divided_by: cv.compare_at_price | round }}%</span>
+          {%- elsif product != blank -%}
+            {{ cv.price | money }}
+          {%- else -%}
+            €0.00
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.short_desc != blank -%}
+          <p class="bb-buybox__desc">{{ section.settings.short_desc | newline_to_br }}</p>
+        {%- elsif product.description != blank -%}
+          <div class="bb-buybox__desc rte">{{ product.description }}</div>
+        {%- endif -%}
+
+        {%- if product != blank and product.has_only_default_variant == false -%}
+          {%- for option in product.options_with_values -%}
+            <div class="bb-opt" data-bb-option>
+              <span class="bb-opt__label">{{ option.name }}</span>
+              <div class="bb-opt__pills">
+                {%- for value in option.values -%}
+                  <label class="bb-opt__pill">
+                    <input type="radio" name="bb-option-{{ option.position }}" value="{{ value | escape }}"
+                           {% if option.selected_value == value %}checked{% endif %}>
+                    <span>{{ value }}</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+
+        {%- if product != blank -%}
+          {%- form 'product', product, class: 'bb-buybox__form' -%}
+            <input type="hidden" name="id" value="{{ cv.id }}">
+            <button type="submit" name="add" class="bb-btn bb-buybox__add" data-bb-add
+                    {% if cv.available == false %}disabled{% endif %}>
+              <span data-bb-add-label>{% if cv.available == false %}{{ section.settings.sold_out_text }}{% else %}{{ section.settings.button_text }}{% endif %}</span>
+            </button>
+          {%- endform -%}
+        {%- else -%}
+          <button type="button" class="bb-btn bb-buybox__add" disabled><span>{{ section.settings.button_text }}</span></button>
+          <p class="bb-buybox__desc">Add a product in your Shopify admin and this page fills in automatically.</p>
+        {%- endif -%}
+
+        {%- if section.blocks.size > 0 -%}
+          <div class="bb-assur">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'assurance' -%}
+                <div class="bb-assur__item" {{ block.shopify_attributes }}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    {%- case block.settings.icon -%}
+                      {%- when 'truck' -%}<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>
+                      {%- when 'return' -%}<path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/>
+                      {%- when 'lock' -%}<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+                      {%- else -%}<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>
+                    {%- endcase -%}
+                  </svg>
+                  <span>{{ block.settings.text }}</span>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%} ---------- Rich description ---------- {%- endcomment -%}
+    {%- if section.settings.story_title != blank or section.settings.story_text != blank -%}
+      <div class="bb-reveal" style="margin-top: clamp(32px,5vw,64px); max-width: 760px;">
+        {%- if section.settings.story_title != blank -%}<h2 class="bb-h2" style="font-size:{{ section.settings.title_size | times: 0.7 | round }}px;">{{ section.settings.story_title }}</h2>{%- endif -%}
+        {%- if section.settings.story_text != blank -%}<p class="bb-lead" style="margin-top:12px;">{{ section.settings.story_text | newline_to_br }}</p>{%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- assign features = section.blocks | where: 'type', 'feature' -%}
+    {%- if features.size > 0 -%}
+      <div class="bb-feature-grid">
+        {%- for block in features -%}
+          <div class="bb-feature bb-reveal" {{ block.shopify_attributes }}>
+            <h4>{{ block.settings.title }}</h4>
+            <p>{{ block.settings.text | newline_to_br }}</p>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.includes_title != blank or section.settings.includes_list != blank -%}
+      <div class="bb-reveal" style="margin-top: clamp(28px,4vw,48px); max-width: 620px;">
+        {%- if section.settings.includes_title != blank -%}<h3 class="bb-box__name" style="font-size:22px;">{{ section.settings.includes_title }}</h3>{%- endif -%}
+        <ul class="bb-includes">
+          {%- assign items = section.settings.includes_list | newline_to_br | split: '<br />' -%}
+          {%- for item in items -%}
+            {%- assign clean = item | strip -%}
+            {%- if clean != blank -%}<li>{{ clean }}</li>{%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if product != blank and product.has_only_default_variant == false -%}
+    <script type="application/json" id="bb-variant-data">
+      [
+        {%- for variant in product.variants -%}
+          {
+            "id": {{ variant.id }},
+            "price": {{ variant.price }},
+            "compare_at_price": {{ variant.compare_at_price | default: 0 }},
+            "available": {{ variant.available }},
+            "options": {{ variant.options | json }}
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    </script>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "BB — Product",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small label above title", "default": "Handmade jewelry" },
+    { "type": "textarea", "id": "short_desc", "label": "Short description (leave empty to use the catalog description)" },
+    { "type": "text", "id": "button_text", "label": "Add-to-cart button text", "default": "Add to cart" },
+    { "type": "text", "id": "sold_out_text", "label": "Sold-out text", "default": "Sold out" },
+    { "type": "header", "content": "Story block" },
+    { "type": "text", "id": "story_title", "label": "Story title", "default": "Made to be worn every day" },
+    { "type": "textarea", "id": "story_text", "label": "Story text", "default": "Each piece is hand-strung with premium glass and stone beads, then checked one by one before it reaches you." },
+    { "type": "header", "content": "\"What's included\"" },
+    { "type": "text", "id": "includes_title", "label": "Title", "default": "What's inside" },
+    { "type": "textarea", "id": "includes_list", "label": "One item per line", "default": "Hand-strung beaded bracelet\nReusable velvet pouch\nCare card with styling tips" },
+    { "type": "header", "content": "Typography" },
+    { "type": "range", "id": "title_size", "label": "Title size (px)", "min": 22, "max": 56, "step": 2, "unit": "px", "default": 36 },
+    { "type": "range", "id": "body_size", "label": "Body text size (px)", "min": 13, "max": 22, "step": 1, "unit": "px", "default": 15 },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 48 }
+  ],
+  "blocks": [
+    {
+      "type": "assurance",
+      "name": "Assurance",
+      "settings": [
+        { "type": "select", "id": "icon", "label": "Icon", "options": [
+          { "value": "truck", "label": "Truck" }, { "value": "return", "label": "Returns" }, { "value": "lock", "label": "Lock" }, { "value": "spark", "label": "Sparkle" } ], "default": "truck" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Free worldwide shipping over €60" }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Feature card",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Premium beads" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Glass, freshwater pearl and natural stone — no cheap plastic." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "BB — Product",
+      "blocks": [
+        { "type": "assurance", "settings": { "icon": "truck", "text": "Free worldwide shipping over €60" } },
+        { "type": "assurance", "settings": { "icon": "return", "text": "30-day easy returns" } },
+        { "type": "assurance", "settings": { "icon": "lock", "text": "Secure checkout" } },
+        { "type": "feature", "settings": { "title": "Premium beads", "text": "Glass, freshwater pearl and natural stone — no cheap plastic." } },
+        { "type": "feature", "settings": { "title": "Made by hand", "text": "Hand-strung and quality-checked one piece at a time." } },
+        { "type": "feature", "settings": { "title": "Stretch fit", "text": "Strong elastic core that slips on and stays comfy all day." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

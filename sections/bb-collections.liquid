@@ -1,0 +1,156 @@
+{{ 'bb-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bb-scripts.js' | asset_url }}" defer></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    /* fades to white at both the top and bottom edges, so there's no hard
+       seam against the (white) sections above and below — just a soft
+       whisper of colour through the middle. */
+    background: linear-gradient(180deg, #FFFFFF 0%, {{ section.settings.bg_color | default: '#F6F1FA' }} 50%, #FFFFFF 100%);
+  }
+  #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size }}px; }
+
+  /* bento grid: first card runs big, the rest pack in around it */
+  #shopify-section-{{ section.id }} .bb-collections__grid {
+    grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
+    grid-auto-rows: clamp(150px, 15vw, 210px);
+    grid-auto-flow: dense;
+  }
+  #shopify-section-{{ section.id }} .bb-collection {
+    aspect-ratio: auto;
+  }
+  #shopify-section-{{ section.id }} .bb-collection:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  #shopify-section-{{ section.id }} .bb-collection:first-child .bb-collection__name {
+    font-size: clamp(22px, 2.2vw, 30px);
+  }
+  #shopify-section-{{ section.id }} .bb-collection:first-child .bb-collection__tag {
+    font-size: 14px;
+  }
+
+  /* Below desktop, the 2x2 "featured" bento tile plus a fixed short row height
+     made the small cards look squashed (wide but only ~150-210px tall). Past
+     this point every card — including the first — becomes a plain, evenly
+     proportioned 4:5 card instead, which holds up much better on tablet and
+     phone widths. */
+  @media (max-width: 1100px) {
+    #shopify-section-{{ section.id }} .bb-collections__grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: auto;
+      gap: clamp(12px, 3vw, 20px);
+    }
+    #shopify-section-{{ section.id }} .bb-collection {
+      aspect-ratio: 4 / 5;
+    }
+    #shopify-section-{{ section.id }} .bb-collection:first-child {
+      grid-column: span 1;
+      grid-row: span 1;
+    }
+    #shopify-section-{{ section.id }} .bb-collection:first-child .bb-collection__name {
+      font-size: clamp(16px, 1.4vw, 21px);
+    }
+    #shopify-section-{{ section.id }} .bb-collection:first-child .bb-collection__tag {
+      font-size: 12.5px;
+    }
+  }
+  @media (max-width: 700px) {
+    #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.74 | round }}px; }
+  }
+  /* Phone: a single full-width 4:5 card per row was huge (~470px tall on a
+     375px screen) — keep 2 small cards per row instead, sized to the phone. */
+  @media (max-width: 560px) {
+    #shopify-section-{{ section.id }} .bb-collections__grid { gap: 10px; }
+    #shopify-section-{{ section.id }} .bb-collection__name { font-size: 14px; }
+    #shopify-section-{{ section.id }} .bb-collection__tag { font-size: 11px; }
+    #shopify-section-{{ section.id }} .bb-collection__count { font-size: 9px; margin-bottom: 3px; }
+    #shopify-section-{{ section.id }} .bb-collection__body {
+      left: 10px; right: 10px; bottom: 10px;
+    }
+  }
+{% endstyle %}
+
+{%- assign bb_demos = 'bb-coll-1.jpg,bb-coll-4.jpg,bb-coll-3.jpg,bb-coll-2.jpg,bb-demo-2.jpg,bb-demo-hair.jpg,bb-demo-9.jpg,bb-demo-3.jpg' | split: ',' -%}
+
+<section class="bb-collections bb-section">
+  <div class="bb-container">
+    <div class="bb-head bb-reveal">
+      <div class="bb-head__title">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="bb-eyebrow bb-eyebrow--plain">{{ section.settings.eyebrow }}</span>
+        {%- endif -%}
+        <h2 class="bb-h2">{{ section.settings.heading }}</h2>
+      </div>
+      {%- if section.settings.view_all_label != blank -%}
+        <a class="bb-btn bb-btn--link bb-collections__viewall" href="{{ section.settings.view_all_link | default: '#' }}">
+          {{ section.settings.view_all_label }}
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="bb-collections__grid">
+      {%- for block in section.blocks -%}
+        <a class="bb-collection bb-reveal" href="{{ block.settings.link | default: '#' }}" {{ block.shopify_attributes }}>
+          <span class="bb-collection__img">
+            {% render 'bb-image', image: block.settings.image, label: block.settings.label, width: 700, fallback: bb_demos[forloop.index0] %}
+          </span>
+          <span class="bb-collection__veil"></span>
+          <span class="bb-collection__body">
+            {%- if block.settings.count != blank -%}<span class="bb-collection__count">{{ block.settings.count }}</span>{%- endif -%}
+            <span class="bb-collection__name">{{ block.settings.label }}</span>
+            {%- if block.settings.tagline != blank -%}<span class="bb-collection__tag">{{ block.settings.tagline }}</span>{%- endif -%}
+          </span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "BB — Featured collections",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small label above heading", "default": "Curated" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Featured Collections" },
+    { "type": "text", "id": "view_all_label", "label": "\"View all\" button text", "default": "View all" },
+    { "type": "url", "id": "view_all_link", "label": "\"View all\" link" },
+    { "type": "range", "id": "columns", "label": "Columns (desktop)", "min": 2, "max": 6, "step": 1, "default": 4 },
+    { "type": "range", "id": "heading_size", "label": "Heading size (px)", "min": 22, "max": 64, "step": 2, "unit": "px", "default": 36 },
+    { "type": "color", "id": "bg_color", "label": "Background accent colour", "info": "Shows as a soft tint through the middle of the section, fading to white at the top and bottom edges.", "default": "#F6F1FA" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Space above (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below (px)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "label", "label": "Name", "default": "Collection" },
+        { "type": "text", "id": "count", "label": "Small label (e.g. \"24 pieces\")" },
+        { "type": "text", "id": "tagline", "label": "Tagline" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    {
+      "name": "BB — Featured collections",
+      "blocks": [
+        { "type": "collection", "settings": { "label": "Dreamy Pastels", "count": "24 pieces", "tagline": "Elegant and subtle" } },
+        { "type": "collection", "settings": { "label": "Golden Hour", "count": "18 pieces", "tagline": "Warm and timeless" } },
+        { "type": "collection", "settings": { "label": "Pearl & Glow", "count": "15 pieces", "tagline": "Soft and luminous" } },
+        { "type": "collection", "settings": { "label": "Bubble Pop", "count": "31 pieces", "tagline": "Playful yet refined" } },
+        { "type": "collection", "settings": { "label": "New Arrivals", "count": "9 pieces", "tagline": "Fresh this week" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,152 @@
+/* Bubble Beads - collection cards to match prototype (added by Claude) */
+#MainContent .product-grid .grid__item { position: relative; }
+
+.product-grid .card-wrapper.product-card-wrapper {
+  display: block;
+  background: #ffffff;
+  border: 1px solid #ece7f3;
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+  transition: box-shadow .25s ease, transform .25s ease;
+}
+.product-grid .card-wrapper.product-card-wrapper:hover {
+  box-shadow: 0 16px 36px rgba(94, 58, 124, .16);
+  transform: translateY(-3px);
+}
+.product-grid .card-wrapper .card,
+.product-grid .card-wrapper .card__inner {
+  border: 0 !important;
+  background: transparent;
+  box-shadow: none;
+}
+.product-grid .card-wrapper .card { overflow: visible; }
+.product-grid .card-wrapper .card__inner { border-radius: 0; overflow: hidden; }
+
+.product-grid .card-wrapper .card > .card__content {
+  position: relative;
+  padding: 16px 16px 18px;
+  background: #fff;
+}
+
+.product-grid .card-wrapper .card-information .caption-with-letter-spacing {
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: 11px;
+  opacity: .55;
+  margin-bottom: 2px;
+}
+.product-grid .card-wrapper .card__heading { margin: 2px 0 0; }
+.product-grid .card-wrapper .card__heading a { font-size: 1.05rem; }
+
+.product-grid .card-wrapper .card__badge.bottom.left,
+.product-grid .card-wrapper .card__badge.top.left {
+  top: 12px; left: 12px; right: auto; bottom: auto;
+}
+.product-grid .card-wrapper .card__badge .badge {
+  background: #5e3a7c;
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 11px;
+}
+
+#MainContent .product-grid .card-wrapper .card .quick-add {
+  position: absolute !important;
+  left: 14px !important;
+  right: 14px !important;
+  top: auto !important;
+  bottom: 147px !important;
+  margin: 0 !important;
+  width: auto !important;
+  padding: 0 !important;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .22s ease, transform .22s ease;
+  pointer-events: none;
+  z-index: 4;
+}
+#MainContent .product-grid .card-wrapper .quick-add > product-form,
+#MainContent .product-grid .card-wrapper .quick-add form { margin: 0 !important; }
+#MainContent .product-grid .card-wrapper:hover .card .quick-add,
+#MainContent .product-grid .card-wrapper:focus-within .card .quick-add {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.product-grid .card-wrapper .quick-add__submit.button {
+  background: #5e3a7c !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 10px;
+  min-height: 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  box-shadow: 0 10px 22px rgba(94, 58, 124, .30);
+}
+.product-grid .card-wrapper .quick-add__submit.button:hover { background: #4d2f66 !important; }
+.product-grid .card-wrapper .quick-add__submit.button::before,
+.product-grid .card-wrapper .quick-add__submit.button::after { box-shadow: none !important; }
+
+@media (max-width: 749px) {
+  #MainContent .product-grid .card-wrapper .card .quick-add {
+    position: static !important;
+    bottom: auto !important;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    margin: 12px 0 0 !important;
+  }
+}
+
+.facets-vertical-sort .facet-filters__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #d9cfe6;
+  border-radius: 999px;
+  padding: 5px 8px 5px 16px;
+  background: #fff;
+}
+.facets-vertical-sort .facet-filters__label { margin: 0; }
+.facets-vertical-sort .facet-filters__label label { font-weight: 600; }
+.facets-vertical-sort .select { margin: 0; }
+.facets-vertical-sort .select .facet-filters__sort {
+  border: 0;
+  background: transparent;
+  font-weight: 600;
+  padding: 4px 30px 4px 4px;
+  min-height: 0;
+}
+.facets-vertical-sort .select .icon-caret { right: 10px; }
+
+.facets-vertical .facets__form-vertical .facets__disclosure-vertical {
+  border: 0 !important;
+  margin-bottom: 10px !important;
+}
+.facets-vertical .facets__disclosure-vertical > summary {
+  border: 1px solid #d9cfe6 !important;
+  border-radius: 999px !important;
+  padding: 9px 16px !important;
+  background: #fff !important;
+  list-style: none !important;
+}
+.facets-vertical .facets__disclosure-vertical > summary::-webkit-details-marker { display: none !important; }
+.facets-vertical .facets__disclosure-vertical > summary > div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+.facets-vertical .facets__disclosure-vertical[open] > summary { border-radius: 16px !important; }
+.facets-vertical .facets__disclosure-vertical > summary .icon-caret {
+  margin-right: 6px !important;
+  flex: 0 0 auto !important;
+}
+.facets-vertical .facets__display-vertical { border: 0 !important; padding-top: 12px !important; }

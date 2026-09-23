@@ -1,0 +1,58 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.footer.name",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "logo_width": 200,
+        "logo_text": "Bubble Beads",
+        "tagline": "Handmade beaded jewelry, hair essentials and surprise Bubble Boxes — curated with love.",
+        "show_social": true,
+        "col1_title": "Shop",
+        "col1_link_1_label": "Products",
+        "col1_link_1_url": "shopify://collections/all",
+        "col1_link_2_label": "The Equinox Collection",
+        "col1_link_2_url": "shopify://collections/the-equinox-collection",
+        "col1_link_3_label": "",
+        "col1_link_3_url": "",
+        "col1_link_4_label": "Contact",
+        "col1_link_4_url": "shopify://pages/contact",
+        "col1_link_5_label": "",
+        "col1_link_5_url": "",
+        "col2_title": "Help",
+        "col2_link_1_label": "",
+        "col2_link_1_url": "",
+        "col2_link_2_label": "",
+        "col2_link_2_url": "",
+        "col2_link_3_label": "",
+        "col2_link_3_url": "",
+        "col2_link_4_label": "Contact us",
+        "col2_link_4_url": "shopify://pages/contact",
+        "col2_link_5_label": "",
+        "col2_link_5_url": "",
+        "about_title": "About Bubble Beads",
+        "about_text": "A dreamy little studio making colourful, high-quality bead jewelry you'll want to stack forever.",
+        "rights_text": "All rights reserved.",
+        "show_payment_icons": true,
+        "extra_legal_label": "",
+        "extra_legal_url": "",
+        "margin_top": 0,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

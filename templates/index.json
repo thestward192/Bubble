@@ -1,0 +1,548 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "bb_hero": {
+      "type": "bb-hero",
+      "settings": {
+        "eyebrow": "",
+        "title": "<strong>Build Your </strong><em><strong>Dream</strong></em><strong> Bubble Box</strong>",
+        "text": "Jewelry, hair essentials, and surprise pieces curated with love.",
+        "demo_image": "bb-hero-bracelet-hearts.jpg",
+        "badge_text": "",
+        "full_bleed": true,
+        "min_height": 82,
+        "bg_color_1": "#f4effb",
+        "bg_color_2": "#f0f2fd",
+        "show_fx": false,
+        "show_dots": true,
+        "fx_holo_opacity": 8,
+        "button_label": "Shop the collection",
+        "button_link": "/collections/all",
+        "button_label_2": "Watch our next live",
+        "button_link_2": "",
+        "text_align": "left",
+        "heading_size": 66,
+        "body_size": 17,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "bb_marquee": {
+      "type": "bb-marquee",
+      "blocks": {
+        "m1": {
+          "type": "item",
+          "settings": {
+            "text": "Handmade with love"
+          }
+        },
+        "m2": {
+          "type": "item",
+          "settings": {
+            "text": "Premium quality beads"
+          }
+        },
+        "m3": {
+          "type": "item",
+          "settings": {
+            "text": "Shipping Across Europe"
+          }
+        },
+        "m4": {
+          "type": "item",
+          "settings": {
+            "text": "Build your dream bubble box"
+          }
+        },
+        "m5": {
+          "type": "item",
+          "settings": {
+            "text": "Join our live"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2",
+        "m3",
+        "m4",
+        "m5"
+      ],
+      "settings": {
+        "speed": 30,
+        "direction": "left",
+        "bg_color": "",
+        "padding_top": 14,
+        "padding_bottom": 14
+      }
+    },
+    "bb_tiles": {
+      "type": "bb-category-tiles",
+      "blocks": {
+        "t1": {
+          "type": "tile",
+          "settings": {
+            "image": "shopify://shop_images/f0c48faa-8e9a-48d7-9378-1e2ae8112b03.jpg",
+            "label": "Wrist Candy",
+            "caption": "Bracelets",
+            "link": "/collections/all?filter.p.product_type=Bracelets"
+          }
+        },
+        "t2": {
+          "type": "tile",
+          "settings": {
+            "image": "shopify://shop_images/B983FEE2-E522-4B8F-AA74-27A530B58ED9.png",
+            "label": "Shine at Your Neckline",
+            "caption": "Necklaces",
+            "link": "/collections/all?filter.p.product_type=Necklaces"
+          }
+        },
+        "t3": {
+          "type": "tile",
+          "settings": {
+            "image": "shopify://shop_images/3484AADF-CC55-4FF2-B4FB-4F4F5261EE72.jpg",
+            "label": "Good Hair Club",
+            "caption": "Haircare",
+            "link": "/collections/all?filter.p.product_type=Hair%20Accessories"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3"
+      ],
+      "settings": {
+        "eyebrow": "Categories",
+        "heading": "Shop by Category",
+        "heading_size": 32,
+        "view_all_label": "View All Categories",
+        "view_all_link": "/collections/all",
+        "columns": 3,
+        "label_size": 17,
+        "bg_color": "#ffffff",
+        "padding_top": 56,
+        "padding_bottom": 40
+      }
+    },
+    "bb_scrollvideo": {
+      "type": "bb-scroll-video",
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "heading": "Design a bracelet that's <em>only yours</em>.",
+            "text": "Pick your beads, your charms, your colours — nothing about it is off the shelf."
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "heading": "Strung by hand, <em>bead by bead</em>.",
+            "text": "Every Bubble Beads piece is put together by a real person and checked twice before it ships."
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "heading": "Made to <em>stack &amp; restack</em>.",
+            "text": "Wear it with the rest of your set today, switch it up tomorrow. It's yours to play with."
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3"
+      ],
+      "settings": {
+        "sprite_url": "https://cdn.shopify.com/s/files/1/0771/1565/4198/files/bb-bracelet-sprite-full.webp",
+        "frame_count": 84,
+        "sprite_cols": 12,
+        "sprite_rows": 7,
+        "frame_ratio_w": 360,
+        "frame_ratio_h": 641,
+        "media_height": 460,
+        "fade_bottom": 10,
+        "scroll_mode": "scrub",
+        "segment_seconds": 1.8,
+        "scroll_length": 320,
+        "step_breaks": "0.5, 0.8",
+        "eyebrow": "Make it yours",
+        "heading": "Design a bracelet that's <em>only yours</em>.",
+        "text": "Pick your beads, your charms and your colours — every Bubble Beads bracelet is strung by hand, just for you.",
+        "heading_size": 34,
+        "button_label": "Start customizing",
+        "button_link": "",
+        "bg_color": "#ffffff",
+        "padding_top": 8,
+        "padding_bottom": 56
+      }
+    },
+    "bb_livecta": {
+      "type": "bb-live-cta",
+      "blocks": {
+        "l1": {
+          "type": "slot",
+          "settings": {
+            "day": "Wednesdays",
+            "time": "7:00 PM EST",
+            "platform": "Instagram Live"
+          }
+        },
+        "l2": {
+          "type": "slot",
+          "settings": {
+            "day": "Fridays",
+            "time": "6:00 PM EST",
+            "platform": "TikTok Live"
+          }
+        },
+        "l3": {
+          "type": "slot",
+          "settings": {
+            "day": "Sundays",
+            "time": "3:00 PM EST",
+            "platform": "Instagram Live"
+          }
+        }
+      },
+      "block_order": [
+        "l1",
+        "l2",
+        "l3"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/ADFF8868-2D33-4F78-8C9E-A922E8C537E8.png",
+        "media_side": "left",
+        "media_height": 240,
+        "badge_text": "● LIVE",
+        "eyebrow": "Live shopping",
+        "heading": "Shop with us, live.",
+        "text": "Tune in to our live sessions, see every piece up close, ask anything in the chat and grab the drops before they sell out.",
+        "note": "New lives every week · Replays saved to Highlights",
+        "heading_size": 38,
+        "button_label": "Join Our Live",
+        "button_link": "",
+        "button_label_2": "See the schedule",
+        "schedule_heading": "This week's lives",
+        "button_link_2": "",
+        "schedule_link_label": "View full schedule",
+        "panel_color_1": "#ebe0f7",
+        "panel_color_2": "#e7dff6",
+        "bg_color": "#ffffff",
+        "padding_top": 8,
+        "padding_bottom": 56
+      }
+    },
+    "bb_boxes": {
+      "type": "bb-boxes",
+      "blocks": {
+        "b1": {
+          "type": "box",
+          "settings": {
+            "image": "shopify://shop_images/4a86bfb9-4dc4-438e-ad43-2ced6c58e883.jpg",
+            "demo_image": "bb-coll-2.jpg",
+            "name": "The Mini",
+            "subtitle": "A little taste of Bubble Beads.",
+            "features": "A handful of bracelets\n1–2 hair essentials\nWrapped in a Bubble Box",
+            "price": "€50",
+            "flag": "",
+            "highlight": false,
+            "button_label": "Add",
+            "button_link": ""
+          }
+        },
+        "b2": {
+          "type": "box",
+          "settings": {
+            "image": "shopify://shop_images/4a86bfb9-4dc4-438e-ad43-2ced6c58e883.jpg",
+            "demo_image": "bb-coll-2.jpg",
+            "name": "The Signature",
+            "subtitle": "Our best-balanced box.",
+            "features": "A full bracelet stack\nHair essentials set\n1 styling tool\nGift-ready packaging",
+            "price": "€100",
+            "flag": "Most popular",
+            "highlight": true,
+            "button_label": "Add",
+            "button_link": ""
+          }
+        },
+        "b3": {
+          "type": "box",
+          "settings": {
+            "image": "shopify://shop_images/4a86bfb9-4dc4-438e-ad43-2ced6c58e883.jpg",
+            "demo_image": "bb-coll-2.jpg",
+            "name": "The Full Set",
+            "subtitle": "Everything, all at once.",
+            "features": "Bracelets for every day\nComplete hair essentials kit\nStyling tools\nExclusive extras + card",
+            "price": "€150",
+            "flag": "",
+            "highlight": false,
+            "button_label": "Add",
+            "button_link": ""
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3"
+      ],
+      "settings": {
+        "heading": "Bubble Boxes & Kits",
+        "subheading": "Pick your kit and get pieces hand-selected by our team.",
+        "heading_size": 38,
+        "body_size": 15,
+        "bg_color": "#ffffff",
+        "padding_top": 56,
+        "padding_bottom": 64
+      }
+    },
+    "bb_featured_products": {
+      "type": "bb-featured-products",
+      "settings": {
+        "eyebrow": "Bestsellers",
+        "heading": "Loved Right Now",
+        "heading_size": 36,
+        "collection": "",
+        "products_to_show": 4,
+        "columns": 4,
+        "view_all_label": "View all",
+        "view_all_link": "",
+        "bg_color": "#ffffff",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "bb_newbest": {
+      "type": "bb-new-bestsellers",
+      "blocks": {
+        "n1": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/cba799ed-1841-4520-b284-872b51339e96.jpg",
+            "label": "New In",
+            "subtext": "Discover the latest Bubble Beads arrivals",
+            "button_label": "Shop New In",
+            "link": "/collections/all?sort_by=created-descending"
+          }
+        },
+        "n2": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/DCDB94B7-27AC-48F0-980A-1D009114F359.jpg",
+            "label": "Best Sellers",
+            "subtext": "Our most loved pieces",
+            "button_label": "Shop Best Sellers",
+            "link": "/collections/all?sort_by=best-selling"
+          }
+        }
+      },
+      "block_order": [
+        "n1",
+        "n2"
+      ],
+      "settings": {
+        "eyebrow": "Fresh drops",
+        "heading": "What's <em>new & loved</em>",
+        "heading_size": 36,
+        "bg_color": "#ffffff",
+        "padding_top": 56,
+        "padding_bottom": 64
+      }
+    },
+    "bb_testimonials": {
+      "type": "bb-testimonials",
+      "blocks": {
+        "r1": {
+          "type": "review",
+          "settings": {
+            "quote": "I get compliments every single time I wear my Bubble Box pieces. The quality is so much better than I expected.",
+            "rating": 5,
+            "name": "Sofia R.",
+            "role": "Verified buyer"
+          }
+        },
+        "r2": {
+          "type": "review",
+          "settings": {
+            "quote": "The bangle box made the perfect gift — my sister loved unboxing every piece. Will be ordering again for myself.",
+            "rating": 5,
+            "name": "Camila G.",
+            "role": "Verified buyer"
+          }
+        },
+        "r3": {
+          "type": "review",
+          "settings": {
+            "quote": "Fast shipping, beautiful packaging, and the bracelets stack perfectly together. Exactly what I wanted.",
+            "rating": 5,
+            "name": "Valentina M.",
+            "role": "Verified buyer"
+          }
+        },
+        "r4": {
+          "type": "review",
+          "settings": {
+            "quote": "Ordered the Mystery Box on a whim and it's now my favourite thing I own. Every piece felt hand-picked for me.",
+            "rating": 5,
+            "name": "Isabella T.",
+            "role": "Verified buyer"
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3",
+        "r4"
+      ],
+      "settings": {
+        "eyebrow": "Loved by our customers",
+        "heading": "What people are saying",
+        "heading_size": 34,
+        "bg_color": "#f6f1fb",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "bb_ugc": {
+      "type": "bb-ugc-gallery",
+      "blocks": {
+        "u2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/e7dd3789-1e99-48b4-b5ac-5addf1545c27.jpg",
+            "link": ""
+          }
+        },
+        "u3": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/cba799ed-1841-4520-b284-872b51339e96.jpg",
+            "link": ""
+          }
+        },
+        "u4": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/8E2BD904-E6CB-4159-A359-08805646BAB9_716a3de8-8d99-492b-bc55-1ecc7093a282.png",
+            "link": ""
+          }
+        },
+        "u5": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/2B961B3B-01A4-4617-84A9-FF3F0912C7D2.png",
+            "link": ""
+          }
+        },
+        "u6": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/DCDB94B7-27AC-48F0-980A-1D009114F359.jpg",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "u2",
+        "u3",
+        "u4",
+        "u5",
+        "u6"
+      ],
+      "settings": {
+        "eyebrow": "Community",
+        "heading": "Tag us to be featured",
+        "heading_size": 32,
+        "handle_label": "@bubblebeads.shop",
+        "handle_link": "",
+        "cta_title": "Share your look",
+        "cta_text": "Tag us for a chance to be featured right here.",
+        "columns": 6,
+        "bg_color": "#ffffff",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "bb_trust": {
+      "type": "bb-trust-bar",
+      "blocks": {
+        "p1": {
+          "type": "item",
+          "settings": {
+            "icon": "heart",
+            "title": "Handmade with love",
+            "text": ""
+          }
+        },
+        "p2": {
+          "type": "item",
+          "settings": {
+            "icon": "gem",
+            "title": "Premium quality beads",
+            "text": ""
+          }
+        },
+        "p3": {
+          "type": "item",
+          "settings": {
+            "icon": "globe",
+            "title": "Shipping Across Europe",
+            "text": ""
+          }
+        },
+        "p4": {
+          "type": "item",
+          "settings": {
+            "icon": "lock",
+            "title": "Secure payments",
+            "text": ""
+          }
+        },
+        "p5": {
+          "type": "item",
+          "settings": {
+            "icon": "chat",
+            "title": "Join our community",
+            "text": "@bubblebeads.shop"
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5"
+      ],
+      "settings": {
+        "padding_top": 16,
+        "padding_bottom": 24
+      }
+    }
+  },
+  "order": [
+    "bb_hero",
+    "bb_marquee",
+    "bb_tiles",
+    "bb_scrollvideo",
+    "bb_livecta",
+    "bb_boxes",
+    "bb_featured_products",
+    "bb_newbest",
+    "bb_testimonials",
+    "bb_ugc",
+    "bb_trust"
+  ]
+}

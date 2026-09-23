@@ -1,0 +1,97 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "bb_contact": {
+      "type": "bb-contact",
+      "blocks": {
+        "d1": {
+          "type": "detail",
+          "settings": {
+            "label": "Email",
+            "value": "tks_productions@outlook.com",
+            "note": "We reply within 24 h",
+            "link": "mailto:hello@bubblebeads.shop"
+          }
+        },
+        "d2": {
+          "type": "detail",
+          "settings": {
+            "label": "Phone",
+            "value": "+3124 355 9044",
+            "note": "Tues–Fri, 09:00–18:00, Sat 09:00-16:00",
+            "link": "tel:+15550123456"
+          }
+        },
+        "d3": {
+          "type": "detail",
+          "settings": {
+            "label": "Studio",
+            "value": "Hatertseweg 115\nNijmegen\n6533 AD\nThe Netherlands",
+            "note": "Visits by appointment only",
+            "link": ""
+          }
+        },
+        "h1": {
+          "type": "hours",
+          "settings": {
+            "title": "Opening hours",
+            "rows": "Tuesday – Friday | 09:00 – 18:00\nSaturday | 09:00 – 14:00\nSunday - Monday | Closed"
+          }
+        },
+        "s1": {
+          "type": "social",
+          "settings": {
+            "title": "Follow us",
+            "instagram": "https://instagram.com/bubblebeads.shop",
+            "tiktok": "",
+            "pinterest": "",
+            "facebook": ""
+          }
+        }
+      },
+      "block_order": [
+        "d1",
+        "d2",
+        "d3",
+        "h1",
+        "s1"
+      ],
+      "settings": {
+        "show_breadcrumb": true,
+        "crumb_home": "Home",
+        "heading": "Contact",
+        "subtext": "We're here to help. We reply within 24 hours.",
+        "heading_size": 52,
+        "info_title": "Contact information",
+        "form_title": "Send us a message",
+        "form_subtext": "Fill in the form and we'll get back to you as soon as we can.",
+        "label_name": "Name",
+        "ph_name": "Your name",
+        "label_email": "Email",
+        "ph_email": "you@email.com",
+        "label_phone": "Phone",
+        "ph_phone": "+1 555 000 0000",
+        "label_subject": "Subject",
+        "subject_options": "General enquiry\nOrder question\nReturns & exchanges\nWholesale / collab\nOther",
+        "label_message": "Message",
+        "ph_message": "Write your message here…",
+        "privacy_text": "I've read and accept the <a href=\"/policies/privacy-policy\">Privacy Policy</a>. My details will only be used to handle my enquiry.",
+        "button_text": "Send message",
+        "success_text": "Thanks! Your message has been sent — we'll reply within 24 hours.",
+        "padding_top": 40,
+        "padding_bottom": 64
+      }
+    }
+  },
+  "order": [
+    "bb_contact"
+  ]
+}
