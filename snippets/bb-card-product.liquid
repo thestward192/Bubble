@@ -24,27 +24,52 @@
       assign discount_pct = card_product.compare_at_price | minus: card_product.price | times: 100.0 | divided_by: card_product.compare_at_price | round
     endif
     assign eyebrow = card_product.type | default: card_product.vendor
+
+    # Second photo (e.g. model wearing it): first image after the featured one.
+    # Desktop: cross-fades in on hover. Touch: swipe between the two.
+    assign second_media = nil
+    for m in card_product.media
+      if m.media_type == 'image' and m.id != card_product.featured_media.id
+        assign second_media = m
+        break
+      endif
+    endfor
   -%}
   <div class="bb-pcard">
     <a href="{{ card_product.url }}" class="bb-pcard__media-link">
-      <div class="bb-pcard__media">
+      <div class="bb-pcard__media{% if second_media %} bb-pcard__media--dual{% endif %}">
         {%- if card_product.featured_media -%}
-          <img
-            srcset="
-              {%- if card_product.featured_media.width >= 360 -%}{{ card_product.featured_media | image_url: width: 360 }} 360w,{%- endif -%}
-              {%- if card_product.featured_media.width >= 533 -%}{{ card_product.featured_media | image_url: width: 533 }} 533w,{%- endif -%}
-              {%- if card_product.featured_media.width >= 720 -%}{{ card_product.featured_media | image_url: width: 720 }} 720w,{%- endif -%}
-              {{ card_product.featured_media | image_url }} {{ card_product.featured_media.width }}w
-            "
-            src="{{ card_product.featured_media | image_url: width: 533 }}"
-            sizes="(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw"
-            alt="{{ card_product.featured_media.alt | escape }}"
-            {% unless lazy_load == false %}
-              loading="lazy"
-            {% endunless %}
-            width="{{ card_product.featured_media.width }}"
-            height="{{ card_product.featured_media.height }}"
-          >
+          <div class="bb-pcard__slides">
+            {%- for n in (1..2) -%}
+              {%- if n == 1 -%}
+                {%- assign card_img = card_product.featured_media -%}
+              {%- elsif second_media -%}
+                {%- assign card_img = second_media -%}
+              {%- else -%}
+                {%- break -%}
+              {%- endif -%}
+              <img
+                class="bb-pcard__img bb-pcard__img--{{ n }}"
+                srcset="
+                  {%- if card_img.width >= 360 -%}{{ card_img | image_url: width: 360 }} 360w,{%- endif -%}
+                  {%- if card_img.width >= 533 -%}{{ card_img | image_url: width: 533 }} 533w,{%- endif -%}
+                  {%- if card_img.width >= 720 -%}{{ card_img | image_url: width: 720 }} 720w,{%- endif -%}
+                  {{ card_img | image_url }} {{ card_img.width }}w
+                "
+                src="{{ card_img | image_url: width: 533 }}"
+                sizes="(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw"
+                alt="{{ card_img.alt | default: card_product.title | escape }}"
+                {% if n == 2 or lazy_load != false %}
+                  loading="lazy"
+                {% endif %}
+                width="{{ card_img.width }}"
+                height="{{ card_img.height }}"
+              >
+            {%- endfor -%}
+          </div>
+          {%- if second_media -%}
+            <span class="bb-pcard__dots" aria-hidden="true"><i class="is-active"></i><i></i></span>
+          {%- endif -%}
         {%- else -%}
           {{ 'product-1' | placeholder_svg_tag: 'bb-pcard__placeholder' }}
         {%- endif -%}
@@ -81,7 +106,7 @@
         {%- endif -%}
       </div>
 
-      {%- if card_product.available -%}
+      {%- if card_product.available and card_product.has_only_default_variant -%}
         <product-form class="bb-pcard__add-wrap">
           {%- form 'product', card_product, novalidate: 'novalidate' -%}
             <input
@@ -89,20 +114,23 @@
               name="id"
               value="{{ card_product.selected_or_first_available_variant.id }}"
             >
-            {%- if card_product.has_only_default_variant -%}
-              <button type="submit" name="add" class="bb-pcard__add">
-                <span>{{ 'sections.bb_card.add_to_cart' | t }}</span>
-                {%- render 'loading-spinner' -%}
-              </button>
-            {%- else -%}
-              <a href="{{ card_product.url }}" class="bb-pcard__add">
-                {{ 'sections.bb_card.choose_options' | t }}
-              </a>
-            {%- endif -%}
+            <button type="submit" name="add" class="bb-pcard__add">
+              <span>{{ 'sections.bb_card.add_to_cart' | t }}</span>
+              {%- render 'loading-spinner' -%}
+            </button>
           {%- endform -%}
         </product-form>
+      {%- elsif card_product.available -%}
+        {%- comment -%} No <product-form> here: it expects a submit button and throws without one {%- endcomment -%}
+        <div class="bb-pcard__add-wrap">
+          <a href="{{ card_product.url }}" class="bb-pcard__add">
+            {{ 'sections.bb_card.choose_options' | t }}
+          </a>
+        </div>
       {%- else -%}
-        <span class="bb-pcard__add bb-pcard__add--soldout">{{ 'sections.bb_card.sold_out' | t }}</span>
+        <div class="bb-pcard__add-wrap">
+          <span class="bb-pcard__add bb-pcard__add--soldout">{{ 'sections.bb_card.sold_out' | t }}</span>
+        </div>
       {%- endif -%}
     </div>
   </div>

@@ -16,20 +16,25 @@
         "show_collection_description": true,
         "fallback_description": "",
         "color_scheme": "scheme-1",
-        "padding_top": 40,
+        "show_banner": true,
+        "banner_height": 240,
+        "image_position": 70,
+        "padding_top": 0,
         "padding_bottom": 8
       }
     },
     "product-grid": {
       "type": "bb-collection-grid",
       "settings": {
-        "products_per_page": 16,
-        "columns_desktop": 3,
+        "products_per_page": 15,
+        "columns_desktop": 4,
         "columns_mobile": "2",
         "color_scheme": "scheme-1",
         "enable_filtering": true,
         "enable_sorting": true,
-        "padding_top": 40,
+        "enable_sparkles": true,
+        "sparkle_amount": "medium",
+        "padding_top": 24,
         "padding_bottom": 80
       }
     }

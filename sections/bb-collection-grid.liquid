@@ -11,88 +11,140 @@
     padding-bottom: {{ section.settings.padding_bottom }}px;
   }
   #shopify-section-{{ section.id }} .bb-shop-grid__list {
-    grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+    grid-template-columns: repeat({{ section.settings.columns_mobile }}, minmax(0, 1fr));
   }
   @media screen and (min-width: 750px) {
     #shopify-section-{{ section.id }} .bb-shop-grid__list {
-      grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+      grid-template-columns: repeat({{ section.settings.columns_desktop | at_most: 3 }}, minmax(0, 1fr));
+    }
+  }
+  @media screen and (min-width: 990px) {
+    #shopify-section-{{ section.id }} .bb-shop-grid__list {
+      grid-template-columns: repeat({{ section.settings.columns_desktop }}, minmax(0, 1fr));
     }
   }
 {%- endstyle -%}
 
-<div class="bb-shop-grid color-{{ section.settings.color_scheme }}">
+<div class="bb-shop-grid color-{{ section.settings.color_scheme }}"{% if section.settings.enable_sparkles %} data-bb-sparkles="{{ section.settings.sparkle_amount }}"{% endif %}>
   {%- paginate collection.products by section.settings.products_per_page -%}
     <div class="bb-shop-grid__layout">
       {%- if section.settings.enable_filtering or section.settings.enable_sorting -%}
-        <aside class="bb-shop-grid__aside" id="main-collection-filters" data-id="{{ section.id }}" aria-labelledby="verticalTitle">
-          {% render 'facets',
-            results: collection,
-            enable_filtering: section.settings.enable_filtering,
-            enable_sorting: false,
-            filter_type: 'vertical',
-            paginate: paginate
-          %}
-        </aside>
-      {%- endif -%}
+        <div class="bb-shop-grid__toolbar{% unless section.settings.enable_filtering %} bb-shop-grid__toolbar--nofilter{% endunless %}">
+          {%- if section.settings.enable_filtering -%}
+            <button
+              type="button"
+              class="bb-filter-toggle"
+              data-bb-filter-open
+              aria-controls="BbFilterDrawer-{{ section.id }}"
+              aria-expanded="false"
+            >
+              <span class="svg-wrapper">{{- 'icon-filter.svg' | inline_asset_content -}}</span>
+              <span>{{ 'products.facets.filter_button' | t }}</span>
+            </button>
+          {%- endif -%}
 
-      <div class="bb-shop-grid__main">
-        {%- if section.settings.enable_sorting -%}
-          <facet-filters-form class="bb-shop-grid__toolbar">
-            <form id="BbFacetSortForm">
-              <p class="bb-shop-grid__count" role="status">
-                <span id="ProductCountDesktop">
-                  {%- if collection.results_count -%}
-                    {{ 'templates.search.results_with_count' | t: terms: collection.terms, count: collection.results_count }}
-                  {%- else -%}
-                    {{ 'products.facets.product_count_simple' | t: count: collection.products_count }}
-                  {%- endif -%}
-                </span>
-              </p>
-              <div class="bb-shop-grid__sort">
-                <label for="BbSortBy">{{ 'products.facets.sort_by_label' | t }}</label>
-                {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
-                <select name="sort_by" class="bb-shop-grid__sort-select" id="BbSortBy">
-                  {%- for option in collection.sort_options -%}
-                    <option value="{{ option.value | escape }}" {% if option.value == sort_by %}selected{% endif %}>
-                      {{ option.name | escape }}
-                    </option>
-                  {%- endfor -%}
-                </select>
-              </div>
-            </form>
-          </facet-filters-form>
-        {%- endif -%}
+          <p class="bb-shop-grid__count" role="status">
+            <span id="ProductCountDesktop">
+              {%- if collection.results_count -%}
+                {{ 'templates.search.results_with_count' | t: terms: collection.terms, count: collection.results_count }}
+              {%- else -%}
+                {{ 'products.facets.product_count_simple' | t: count: collection.products_count }}
+              {%- endif -%}
+            </span>
+          </p>
 
-        <div id="ProductGridContainer">
-          {%- if collection.products.size == 0 -%}
-            <div class="collection bb-shop-grid__empty">
-              <p>{{ 'sections.collection_template.empty' | t }}</p>
-              <a href="{{ collection.url }}" class="bb-btn">
-                {{ 'sections.collection_template.use_fewer_filters_html' | t: link: collection.url, class: '' | strip_html }}
-              </a>
-            </div>
-          {%- else -%}
-            <div class="collection">
-            <ul id="product-grid" data-id="{{ section.id }}" class="bb-shop-grid__list">
-              {%- for product in collection.products -%}
-                {%- assign lazy = true -%}
-                {%- if forloop.index <= 4 -%}{%- assign lazy = false -%}{%- endif -%}
-                <li class="bb-reveal">
-                  {% render 'bb-card-product', card_product: product, lazy_load: lazy %}
-                </li>
-              {%- endfor -%}
-            </ul>
-
-            {%- if paginate.pages > 1 -%}
-              <div class="bb-shop-grid__pagination">
-                {% render 'pagination', paginate: paginate, anchor: '' %}
-              </div>
-            {%- endif -%}
-            </div>
+          {%- if section.settings.enable_sorting -%}
+            {%- comment -%} id must be FacetSortForm: facets.js only sends forms with Dawn's ids, so the sort is kept when filtering {%- endcomment -%}
+            <facet-filters-form class="bb-shop-grid__sort-form">
+              <form id="FacetSortForm">
+                <div class="bb-shop-grid__sort">
+                  <label for="BbSortBy">{{ 'products.facets.sort_by_label' | t }}</label>
+                  {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+                  <select name="sort_by" class="bb-shop-grid__sort-select" id="BbSortBy">
+                    {%- for option in collection.sort_options -%}
+                      <option value="{{ option.value | escape }}" {% if option.value == sort_by %}selected{% endif %}>
+                        {{ option.name | escape }}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                </div>
+              </form>
+            </facet-filters-form>
           {%- endif -%}
         </div>
+      {%- endif -%}
+
+      <div id="ProductGridContainer">
+        {%- if collection.products.size == 0 -%}
+          <div class="collection bb-shop-grid__empty">
+            <p>{{ 'sections.collection_template.empty' | t }}</p>
+            <a href="{{ collection.url }}" class="bb-btn">
+              {{ 'sections.collection_template.use_fewer_filters_html' | t: link: collection.url, class: '' | strip_html }}
+            </a>
+          </div>
+        {%- else -%}
+          <div class="collection">
+          <ul id="product-grid" data-id="{{ section.id }}" class="bb-shop-grid__list">
+            {%- for product in collection.products -%}
+              {%- assign lazy = true -%}
+              {%- if forloop.index <= 4 -%}{%- assign lazy = false -%}{%- endif -%}
+              <li class="bb-reveal">
+                {% render 'bb-card-product', card_product: product, lazy_load: lazy %}
+              </li>
+            {%- endfor -%}
+          </ul>
+
+          {%- if paginate.pages > 1 -%}
+            <div class="bb-shop-grid__pagination">
+              {% render 'pagination', paginate: paginate, anchor: '' %}
+            </div>
+          {%- endif -%}
+          </div>
+        {%- endif -%}
       </div>
     </div>
+
+    {%- if section.settings.enable_filtering -%}
+      {%- comment -%}
+        Slide-in panel from the right holding the same vertical filter form
+        the old sidebar used (so it keeps that look: collapsible groups,
+        custom checkboxes, price slider). Opened by [data-bb-filter-open],
+        see bb-collection.js.
+      {%- endcomment -%}
+      <div class="bb-filter-drawer" id="BbFilterDrawer-{{ section.id }}" data-bb-filter-drawer>
+        <div class="bb-filter-drawer__overlay" data-bb-filter-close></div>
+        <aside
+          class="bb-filter-drawer__panel bb-shop-grid__aside"
+          id="main-collection-filters"
+          data-id="{{ section.id }}"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="BbFilterTitle-{{ section.id }}"
+          tabindex="-1"
+        >
+          <div class="bb-filter-drawer__head">
+            <h2 class="bb-filter-drawer__title" id="BbFilterTitle-{{ section.id }}">{{ 'products.facets.filter_button' | t }}</h2>
+            <button type="button" class="bb-filter-drawer__close" data-bb-filter-close aria-label="{{ 'accessibility.close' | t }}">
+              <span class="svg-wrapper">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+            </button>
+          </div>
+          <div class="bb-filter-drawer__body">
+            {% render 'facets',
+              results: collection,
+              enable_filtering: true,
+              enable_sorting: false,
+              filter_type: 'vertical',
+              paginate: paginate
+            %}
+          </div>
+          <div class="bb-filter-drawer__foot">
+            <button type="button" class="bb-filter-drawer__done" data-bb-filter-close>
+              {{ 'products.facets.apply' | t }}
+            </button>
+          </div>
+        </aside>
+      </div>
+    {%- endif -%}
   {%- endpaginate -%}
 </div>
 
@@ -107,13 +159,15 @@
       "label": "Productos por página",
       "min": 8,
       "max": 36,
-      "step": 4,
-      "default": 16
+      "step": 1,
+      "default": 15,
+      "info": "15 con 4 columnas = 3 filas completas y una última fila de 3."
     },
     {
       "type": "range",
       "id": "columns_desktop",
       "label": "Columnas en escritorio",
+      "info": "En tablet se usan como máximo 3.",
       "min": 2,
       "max": 4,
       "step": 1,
@@ -128,6 +182,25 @@
         { "value": "2", "label": "2" }
       ],
       "default": "2"
+    },
+    { "type": "header", "content": "Destellos" },
+    {
+      "type": "checkbox",
+      "id": "enable_sparkles",
+      "label": "Mostrar destellos",
+      "info": "Pequeños brillos dorados que aparecen al azar sobre los productos y el banner. Se desactivan solos si el visitante tiene \"reducir movimiento\" activado.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "sparkle_amount",
+      "label": "Cantidad de destellos",
+      "options": [
+        { "value": "low", "label": "Pocos" },
+        { "value": "medium", "label": "Normal" },
+        { "value": "high", "label": "Muchos" }
+      ],
+      "default": "medium"
     },
     {
       "type": "color_scheme",

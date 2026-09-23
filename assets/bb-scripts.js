@@ -14,17 +14,21 @@
       return;
     }
     if (!revealIO) {
+      // Fire slightly *before* an element scrolls in (bottom margin +15%),
+      // and stagger only the ones arriving together in this batch — using
+      // the index in the whole list made lower rows wait ~0.5s extra and
+      // left a blank gap while scrolling.
       revealIO = new IntersectionObserver(function (entries) {
+        var n = 0;
         entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
           var el = entry.target;
-          var sibs = Array.prototype.slice.call(el.parentNode.querySelectorAll(':scope > .bb-reveal'));
-          var idx = sibs.indexOf(el);
-          el.style.setProperty('--bb-delay', (idx > -1 ? Math.min(idx, 6) * 0.08 : 0) + 's');
+          el.style.setProperty('--bb-delay', Math.min(n, 4) * 0.06 + 's');
+          n++;
           el.classList.add('bb-visible');
           revealIO.unobserve(el);
         });
-      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+      }, { rootMargin: '0px 0px 15% 0px', threshold: 0 });
     }
     els.forEach(function (el) { revealIO.observe(el); });
   }
@@ -159,6 +163,23 @@
     if (mq.addEventListener) mq.addEventListener('change', apply);
     else mq.addListener(apply);
   }
+
+  /* ---- product card: dots follow the touch swipe between the 2 photos ---
+     One delegated capture listener, so cards injected later (filters,
+     pagination, theme editor) work without re-init. */
+  function initCardSwipe() {
+    if (window.__bbCardSwipe) return;
+    window.__bbCardSwipe = true;
+    document.addEventListener('scroll', function (e) {
+      var el = e.target;
+      if (!el.classList || !el.classList.contains('bb-pcard__slides')) return;
+      var dots = el.parentNode.querySelectorAll('.bb-pcard__dots i');
+      if (!dots.length || !el.clientWidth) return;
+      var idx = Math.round(el.scrollLeft / el.clientWidth);
+      for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('is-active', i === idx);
+    }, { capture: true, passive: true });
+  }
+  initCardSwipe();
 
   function ready(fn) {
     if (document.readyState !== 'loading') fn();

@@ -1,31 +1,64 @@
 {{ 'bb-collection.css' | asset_url | stylesheet_tag }}
 
+{%- liquid
+  assign banner_h = section.settings.banner_height
+  assign banner_h_m = banner_h | times: 0.68 | round
+  if banner_h_m < 130
+    assign banner_h_m = 130
+  endif
+-%}
+
 {%- style -%}
   #shopify-section-{{ section.id }} {
     background: var(--bbc-bg, #faf8ff);
     padding-top: {{ section.settings.padding_top }}px;
     padding-bottom: {{ section.settings.padding_bottom }}px;
   }
+  #shopify-section-{{ section.id }} .bb-shop-hero--banner { --bb-banner-h: {{ banner_h }}px; }
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .bb-shop-hero--banner { --bb-banner-h: {{ banner_h_m }}px; }
+  }
 {%- endstyle -%}
 
-<div class="bb-shop-hero color-{{ section.settings.color_scheme }}">
-  <div class="bb-shop-hero__inner">
-    {%- if section.settings.show_breadcrumb -%}
-      <div class="bb-shop-crumb">
-        <a href="{{ routes.root_url }}">{{ 'sections.bb_collection_hero.home' | t }}</a>
-        <span aria-hidden="true">/</span>
-        {{ collection.title | escape }}
+<div class="bb-shop-hero{% if section.settings.show_banner %} bb-shop-hero--banner{% endif %} color-{{ section.settings.color_scheme }}">
+  {%- if section.settings.show_banner -%}
+    {%- comment -%}
+      Wide, short banner edge to edge; the title sits on the plain left side.
+      Default photo: assets/bb-shop-hero.webp (Jess Bailey on Unsplash, Unsplash License).
+    {%- endcomment -%}
+    <div class="bb-shop-hero__banner" style="--bb-banner-pos: {{ section.settings.image_position }}% center;">
+      {%- if section.settings.banner_image != blank -%}
+        {{
+          section.settings.banner_image
+          | image_url: width: 2400
+          | image_tag:
+            class: 'bb-shop-hero__img',
+            loading: 'eager',
+            fetchpriority: 'high',
+            sizes: '100vw',
+            widths: '750, 1100, 1500, 2000, 2400',
+            alt: ''
+        }}
+      {%- else -%}
+        <img
+          class="bb-shop-hero__img"
+          src="{{ 'bb-shop-hero.webp' | asset_url }}"
+          alt=""
+          width="2400"
+          height="600"
+          loading="eager"
+          fetchpriority="high"
+        >
+      {%- endif -%}
+      <div class="bb-shop-hero__inner bb-shop-hero__overlay">
+        {%- render 'bb-shop-hero-text', show_breadcrumb: section.settings.show_breadcrumb, show_description: section.settings.show_collection_description, fallback: section.settings.fallback_description -%}
       </div>
-    {%- endif -%}
-
-    <h1 class="bb-shop-hero__title">{{ collection.title | escape }}</h1>
-
-    {%- if section.settings.show_collection_description and collection.description != blank -%}
-      <div class="bb-shop-hero__desc rte">{{ collection.description }}</div>
-    {%- elsif section.settings.fallback_description != blank -%}
-      <div class="bb-shop-hero__desc rte">{{ section.settings.fallback_description }}</div>
-    {%- endif -%}
-  </div>
+    </div>
+  {%- else -%}
+    <div class="bb-shop-hero__inner">
+      {%- render 'bb-shop-hero-text', show_breadcrumb: section.settings.show_breadcrumb, show_description: section.settings.show_collection_description, fallback: section.settings.fallback_description -%}
+    </div>
+  {%- endif -%}
 </div>
 
 {% schema %}
@@ -50,6 +83,41 @@
       "id": "fallback_description",
       "label": "Texto si la colección no tiene descripción",
       "default": "Piezas únicas, hechas a mano con materiales de calidad. Cada detalle importa."
+    },
+    { "type": "header", "content": "Banner" },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Mostrar banner con imagen",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Imagen del banner",
+      "info": "Mejor una foto ancha (unos 2400 × 600 px) con el lado izquierdo liso para el título. Vacío = foto de joyas por defecto."
+    },
+    {
+      "type": "range",
+      "id": "banner_height",
+      "label": "Alto del banner (escritorio)",
+      "min": 140,
+      "max": 360,
+      "step": 10,
+      "unit": "px",
+      "default": 240,
+      "info": "En móvil se usa un 68 %."
+    },
+    {
+      "type": "range",
+      "id": "image_position",
+      "label": "Encuadre horizontal de la imagen",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70,
+      "info": "Qué parte de la foto se ve cuando la pantalla es estrecha (0 = izquierda, 100 = derecha)."
     },
     {
       "type": "color_scheme",
