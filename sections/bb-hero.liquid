@@ -13,6 +13,10 @@
   #shopify-section-{{ section.id }} .bb-eyebrow { {% if section.settings.text_align == 'center' %}margin-inline:auto;{% endif %} }
   #shopify-section-{{ section.id }} .bb-hero__text { {% if section.settings.text_align == 'center' %}margin-inline:auto;{% elsif section.settings.text_align == 'right' %}margin-left:auto;{% endif %} }
   #shopify-section-{{ section.id }} .bb-hero__title { font-size: {{ section.settings.heading_size }}px; }
+  #shopify-section-{{ section.id }} .bb-hero__media .bb-img { object-position: {{ section.settings.image_focus_mobile | default: 50 }}% center; }
+  @media (min-width: 991px) {
+    #shopify-section-{{ section.id }} .bb-hero__media .bb-img { object-position: {{ section.settings.image_focus | default: 50 }}% center; }
+  }
   #shopify-section-{{ section.id }} .bb-hero__text { font-size: {{ section.settings.body_size }}px; }
   @media (max-width: 989px) {
     #shopify-section-{{ section.id }} .bb-hero { min-height: 0; padding-top: 24px; padding-bottom: 44px; }
@@ -115,6 +119,17 @@
     height: 100%;
     -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 46%);
     mask-image: linear-gradient(90deg, transparent 0%, #000 46%);
+  }
+  @media (min-width: 991px) {
+    .bb-hero--bg .bb-hero__visual { width: 100%; left: 0; }
+    .bb-hero--bg .bb-hero__media .bb-img { -webkit-mask-image: none; mask-image: none; }
+    .bb-hero--bg .bb-hero__inner { max-width: min(560px, 40vw); }
+    .bb-hero--bg .bb-hero__visual-wash {
+      width: 60%;
+      opacity: 1;
+      background: linear-gradient(90deg, rgba(246, 241, 252, 0.82) 0%, rgba(246, 241, 252, 0.5) 50%, rgba(246, 241, 252, 0) 100%);
+    }
+    .bb-hero--bg .bb-hero__dot, .bb-hero--bg .bb-hero__sparkle { display: none; }
   }
   .bb-hero__visual-wash {
     position: absolute;
@@ -316,6 +331,62 @@
     .bb-hero__badge { animation: none; }
     .bb-hero__fx-holo, .bb-hero__fx-sparkle--1, .bb-hero__glow, .bb-hero__bokeh { animation: none !important; }
   }
+  /* --- floating soap bubbles over the hero image --- */
+  .bb-hero__bubbles {
+    position: absolute; inset: 0;
+    z-index: 2;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .bb-hero__bubble {
+    position: absolute;
+    top: 0;
+    left: var(--x);
+    --s: var(--s0);
+    width: var(--s);
+    height: 100%;
+    transform: translateY(100%);
+    animation: bb-bubble-rise var(--d) linear var(--delay) infinite;
+    will-change: transform;
+  }
+  .bb-hero__bubble::before {
+    content: "";
+    display: block;
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0 7%, rgba(255, 255, 255, 0) 20%),
+      radial-gradient(circle at 68% 74%, rgba(255, 255, 255, 0.5) 0 4%, rgba(255, 255, 255, 0) 14%),
+      radial-gradient(circle at 70% 30%, rgba(160, 205, 255, 0.28), rgba(160, 205, 255, 0) 45%),
+      radial-gradient(circle at 30% 72%, rgba(255, 170, 225, 0.3), rgba(255, 170, 225, 0) 50%),
+      radial-gradient(circle, rgba(255, 255, 255, 0) 58%, rgba(215, 190, 255, 0.4) 76%, rgba(255, 255, 255, 0.85) 100%);
+    box-shadow: inset 0 0 calc(var(--s) * 0.18) rgba(255, 255, 255, 0.55), 0 6px 20px -6px rgba(150, 110, 210, 0.3);
+    animation: bb-bubble-sway calc(var(--d) / 3) ease-in-out var(--delay) infinite alternate,
+               bb-bubble-shimmer 7s linear var(--delay) infinite;
+  }
+  @keyframes bb-bubble-rise {
+    0%   { transform: translateY(100%); opacity: 0; }
+    8%   { opacity: var(--o, 0.85); }
+    88%  { opacity: var(--o, 0.85); }
+    100% { transform: translateY(calc(-1 * var(--s) - 10px)); opacity: 0; }
+  }
+  @keyframes bb-bubble-sway {
+    from { transform: translateX(calc(-1 * var(--w))); }
+    to   { transform: translateX(var(--w)); }
+  }
+  @keyframes bb-bubble-shimmer {
+    from { filter: hue-rotate(0deg); }
+    to   { filter: hue-rotate(360deg); }
+  }
+  @media (max-width: 990px) {
+    .bb-hero__bubbles { border-radius: 16px; }
+    .bb-hero__bubble:nth-child(n + 9) { display: none; }
+    .bb-hero__bubble { --s: calc(var(--sm, 0.6) * var(--s0)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bb-hero__bubbles { display: none; }
+  }
   .bb-eyebrow__icon { display: inline-flex; width: 13px; height: 13px; color: var(--bb-primary); flex: none; }
   .bb-eyebrow__icon svg { width: 100%; height: 100%; }
   .bb-btn__play {
@@ -333,7 +404,7 @@
   .bb-btn--ghost .bb-btn__play { background: var(--bb-primary-soft); color: #fff; }
 {% endstyle %}
 
-<section class="bb-hero bb-section{% unless section.settings.full_bleed %} bb-hero--boxed{% endunless %}{% if section.settings.show_fx %} bb-hero--has-fx{% endif %}">
+<section class="bb-hero bb-section{% unless section.settings.full_bleed %} bb-hero--boxed{% endunless %}{% if section.settings.show_fx %} bb-hero--has-fx{% endif %}{% if section.settings.image_layout == 'background' %} bb-hero--bg{% endif %}">
   {%- if section.settings.show_fx -%}
     {%- assign fx_holo = section.settings.fx_holo -%}
     {%- assign fx_sparkle = section.settings.fx_sparkle -%}
@@ -361,6 +432,16 @@
       {% render 'bb-image', image: section.settings.image, label: 'Hero image', width: 1600, eager: true, fallback: section.settings.demo_image %}
     </div>
     <div class="bb-hero__visual-wash"></div>
+    {%- if section.settings.show_bubbles -%}
+      {%- comment -%} x-position | size px | rise time s | start offset s | sway px | opacity {%- endcomment -%}
+      {%- assign bb_bubbles = '62,70,16,-2,18,0.9|74,38,12,-7,10,0.8|86,96,20,-11,24,0.85|55,26,10,-4,8,0.7|93,48,14,-1,12,0.8|68,120,24,-16,28,0.75|80,30,11,-9,9,0.75|48,56,18,-13,16,0.7|97,24,9,-5,7,0.7|58,44,15,-10,12,0.8|90,64,17,-3,16,0.8|72,22,8,-6,6,0.65|40,34,13,-8,10,0.6|84,40,13,-12,11,0.75' | split: '|' -%}
+      <div class="bb-hero__bubbles" aria-hidden="true">
+        {%- for b in bb_bubbles -%}
+          {%- assign v = b | split: ',' -%}
+          <span class="bb-hero__bubble" style="--x:{{ v[0] }}%;--s0:{{ v[1] }}px;--d:{{ v[2] }}s;--delay:{{ v[3] }}s;--w:{{ v[4] }}px;--o:{{ v[5] }};"></span>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
     {%- if section.settings.eyebrow != blank -%}
       <span class="bb-hero__visual-tag">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 3.6 1.8 6.2 3.6 8s4.4 3 8 3.6c-3.6.6-6.2 1.8-8 3.6s-3 4.4-3.6 8c-.6-3.6-1.8-6.2-3.6-8s-4.4-3-8-3.6c3.6-.6 6.2-1.8 8-3.6s3-4.4 3.6-8z"/></svg>
@@ -421,6 +502,11 @@
     { "type": "textarea", "id": "text", "label": "Paragraph", "default": "One-of-a-kind handmade pieces to carry your mood with you. Discover them online or come pick your favorite at our next live." },
     { "type": "image_picker", "id": "image", "label": "Hero image" },
     { "type": "text", "id": "demo_image", "label": "Demo image file (shown until you pick your own)", "info": "Clear this field to show an empty placeholder instead.", "default": "bb-hero-bracelet-hearts.jpg" },
+    { "type": "select", "id": "image_layout", "label": "Image layout (desktop)", "options": [
+      { "value": "side", "label": "Photo on the right" }, { "value": "background", "label": "Full background behind the text" } ], "default": "side",
+      "info": "Full background suits wide banner images with empty space on the left for the text. On mobile the image always shows under the text." },
+    { "type": "range", "id": "image_focus", "label": "Image focus point — desktop (0 = left, 100 = right)", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 50 },
+    { "type": "range", "id": "image_focus_mobile", "label": "Image focus point — mobile (0 = left, 100 = right)", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 50 },
     { "type": "text", "id": "badge_text", "label": "Floating badge text", "info": "Leave blank to hide the floating badge." },
     { "type": "header", "content": "Size & background" },
     { "type": "checkbox", "id": "full_bleed", "label": "Full-width background (edge to edge)", "info": "On = the glitter background covers the whole hero. Off = plain rounded panel, no glitter.", "default": true },
@@ -429,6 +515,7 @@
     { "type": "color", "id": "bg_color_2", "label": "Background colour 2", "default": "#F0E4F0" },
     { "type": "header", "content": "Glitter background" },
     { "type": "checkbox", "id": "show_fx", "label": "Show animated glitter background", "default": true },
+    { "type": "checkbox", "id": "show_bubbles", "label": "Show floating bubbles over the image", "default": true },
     { "type": "checkbox", "id": "show_dots", "label": "Show floating colour dots + sparkles around the photo", "default": true },
     { "type": "image_picker", "id": "fx_holo", "label": "Holographic texture (optional — replaces the built-in one)" },
     { "type": "image_picker", "id": "fx_sparkle", "label": "Sparkle layer — use an image with a dark background" },
