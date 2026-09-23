@@ -654,6 +654,23 @@ html.bb-filter-lock body {
 .bb-shop-grid__pagination nav {
   font-family: var(--bbc-sans);
 }
+/* Dawn's page links are width:100% of their <li>, so the list has almost no
+   intrinsic width; as a flex item here it shrank to one link wide and iOS Safari
+   stacked the numbers vertically. Give it the full row and keep it on one line. */
+.bb-shop-grid__pagination .pagination-wrapper {
+  width: 100%;
+  margin-top: 0;
+}
+.bb-shop-grid__pagination .pagination__list {
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+.bb-shop-grid__pagination .pagination__list > li {
+  flex: 0 0 4.4rem;
+}
+.bb-shop-grid__pagination .pagination__list > li:not(:last-child) {
+  margin-right: 0.4rem;
+}
 .bb-shop-grid__pagination a,
 .bb-shop-grid__pagination span {
   color: var(--bbc-ink);

@@ -1603,3 +1603,81 @@ body {
   .bb-btn, .bb-tile, .bb-collection, .bb-box, .bb-sale-card { transition: none; }
   * { scroll-behavior: auto !important; }
 }
+
+/* ---- Product image lightbox ----------------------------------------------
+   Dawn renders zoomed images far larger than the screen (1100px wide on phones,
+   full window width on desktop), so they look cropped/oversized. Fit each image
+   inside the viewport instead; extra images stay stacked and scrollable. */
+.product-media-modal .product-media-modal__content > img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 4rem);
+  max-height: calc(100dvh - 4rem);
+  object-fit: contain;
+}
+@media (max-width: 749px) {
+  .product-media-modal .product-media-modal__dialog { height: 100vh; height: 100dvh; }
+  .product-media-modal .product-media-modal__content {
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow-x: hidden;
+    padding: 7rem 1.6rem 2rem;
+  }
+  .product-media-modal .product-media-modal__content > img {
+    width: 100%;
+    max-height: calc(100dvh - 9rem);
+  }
+}
+
+/* ---- Share button (product page) ------------------------------------------ */
+.share-button .share-button__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 0;
+  margin-top: 6px;
+  padding: 11px 22px 11px 16px;
+  border: 1.5px solid var(--bb-primary-soft);
+  border-radius: var(--bb-radius-pill);
+  background: rgba(123, 94, 199, 0.08);
+  color: var(--bb-primary-deep);
+  font: 600 14px/1 var(--bb-sans);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  box-shadow: var(--bb-shadow-sm);
+  transition: background-color 0.25s var(--bb-ease), color 0.25s var(--bb-ease), border-color 0.25s var(--bb-ease), transform 0.25s var(--bb-ease), box-shadow 0.25s var(--bb-ease);
+}
+.share-button .share-button__button .svg-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bb-primary);
+  color: #fff;
+  flex: none;
+  transition: background-color 0.25s var(--bb-ease), color 0.25s var(--bb-ease);
+}
+.share-button .share-button__button .icon-share { width: 12px; height: 12px; margin: 0; min-width: 0; }
+.share-button .share-button__button:hover,
+.share-button .share-button__button:focus-visible,
+.share-button details[open] > .share-button__button {
+  background: var(--bb-primary);
+  border-color: var(--bb-primary);
+  color: #fff;
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: var(--bb-shadow);
+}
+.share-button .share-button__button:hover .svg-wrapper,
+.share-button .share-button__button:focus-visible .svg-wrapper,
+.share-button details[open] > .share-button__button .svg-wrapper {
+  background: #fff;
+  color: var(--bb-primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .share-button .share-button__button { transition: none; }
+  .share-button .share-button__button:hover { transform: none; }
+}
