@@ -11,11 +11,11 @@
     padding-bottom: {{ section.settings.padding_bottom }}px;
   }
   #shopify-section-{{ section.id }} .bb-shop-grid__list {
-    grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+    grid-template-columns: repeat({{ section.settings.columns_mobile }}, minmax(0, 1fr));
   }
   @media screen and (min-width: 750px) {
     #shopify-section-{{ section.id }} .bb-shop-grid__list {
-      grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+      grid-template-columns: repeat({{ section.settings.columns_desktop }}, minmax(0, 1fr));
     }
   }
 {%- endstyle -%}

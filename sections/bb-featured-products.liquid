@@ -45,7 +45,7 @@
 
   #shopify-section-{{ section.id }} .bb-featprod__grid {
     display: grid;
-    grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
+    grid-template-columns: repeat({{ section.settings.columns }}, minmax(0, 1fr));
     gap: clamp(16px, 2vw, 28px);
     list-style: none;
     margin: 0;
@@ -61,10 +61,10 @@
   }
 
   @media (max-width: 1100px) {
-    #shopify-section-{{ section.id }} .bb-featprod__grid { grid-template-columns: repeat(3, 1fr); }
+    #shopify-section-{{ section.id }} .bb-featprod__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
   @media (max-width: 760px) {
-    #shopify-section-{{ section.id }} .bb-featprod__grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    #shopify-section-{{ section.id }} .bb-featprod__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     #shopify-section-{{ section.id }} .bb-h2 { font-size: {{ section.settings.heading_size | times: 0.8 | round }}px; }
     #shopify-section-{{ section.id }} .bb-featprod__blob--1,
     #shopify-section-{{ section.id }} .bb-featprod__blob--2 { width: 22vh; height: 22vh; filter: blur(46px); }

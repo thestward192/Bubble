@@ -473,7 +473,7 @@
   flex-direction: column;
   background: #ffffff;
   border: 1px solid var(--bb-line, rgba(123, 94, 199, 0.14));
-  border-radius: var(--bb-radius-sm, 14px);
+  border-radius: 0;
   overflow: hidden;
   transition: border-color 0.45s var(--bb-ease, ease), box-shadow 0.45s var(--bb-ease, ease), transform 0.45s var(--bb-ease, ease);
 }
@@ -504,6 +504,67 @@
 .bb-pcard:hover .bb-pcard__media img {
   transform: scale(1.035);
 }
+
+/* Second photo: fades in on hover (mouse), swipe carousel (touch) */
+.bb-pcard__slides {
+  position: relative;
+  height: 100%;
+}
+.bb-pcard__img--2 {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s var(--bb-ease, ease), transform 0.9s var(--bb-ease, ease);
+}
+.bb-pcard__dots {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .bb-pcard:hover .bb-pcard__img--2 { opacity: 1; }
+}
+@media (hover: none), (pointer: coarse) {
+  .bb-pcard__media--dual .bb-pcard__slides {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .bb-pcard__media--dual .bb-pcard__slides::-webkit-scrollbar { display: none; }
+  .bb-pcard__media--dual .bb-pcard__img {
+    position: static;
+    flex: 0 0 100%;
+    min-width: 0;
+    opacity: 1;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    transform: none;
+  }
+  .bb-pcard__media--dual .bb-pcard__dots {
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    z-index: 1;
+    display: flex;
+    gap: 6px;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .bb-pcard__dots i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 0 1px rgba(30, 20, 45, 0.15);
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+  .bb-pcard__dots i.is-active {
+    background: #ffffff;
+    transform: scale(1.25);
+  }
+}
 .bb-pcard__badge {
   position: absolute;
   top: 14px;
@@ -515,8 +576,20 @@
   color: #ffffff;
   text-shadow: 0 1px 3px rgba(30, 20, 45, 0.45), 0 1px 10px rgba(30, 20, 45, 0.25);
 }
+/* every card in a row is the same height, button pinned to the bottom */
+.bb-shop-grid__list > li,
+.bb-featprod__grid > li {
+  display: flex;
+  min-width: 0;
+}
+.bb-shop-grid__list > li > .bb-pcard,
+.bb-featprod__grid > li > .bb-pcard {
+  flex: 1 1 auto;
+  width: 100%;
+}
 .bb-pcard__add-wrap {
-  margin-top: 14px;
+  margin-top: auto;
+  padding-top: 14px;
 }
 .bb-pcard__add {
   position: relative;
@@ -555,6 +628,7 @@
   cursor: default;
 }
 .bb-pcard__body {
+  flex: 1 1 auto;
   padding: 18px 18px 20px;
   display: flex;
   flex-direction: column;
@@ -569,6 +643,12 @@
 .bb-pcard__title {
   margin: 4px 0 0;
   font: 400 16px/1.35 var(--bb-serif, var(--bbc-serif));
+  /* always 2 lines tall so cards line up across rows */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.7em;
 }
 .bb-pcard__title a {
   color: var(--bb-ink, var(--bbc-ink));
@@ -613,7 +693,139 @@
 /* --------------------------------------------------------- RESPONSIVE */
 @media screen and (max-width: 749px) {
   .bb-shop-grid__list {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 20px 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px 12px;
+  }
+
+  /* Toolbar: [Filter] [Sort] side by side, then active filters + one count.
+     The aside/main wrappers dissolve so their pieces share one grid. */
+  .bb-shop-grid__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 10px;
+    row-gap: 0;
+  }
+  .bb-shop-grid__aside,
+  .bb-shop-grid__aside .facets-container,
+  .bb-shop-grid__main {
+    display: contents;
+  }
+  .bb-shop-grid__aside .mobile-facets__wrapper {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .bb-shop-grid__toolbar {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .bb-shop-grid__aside .active-facets-mobile {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 12px 0 0;
+  }
+  .bb-shop-grid__aside .active-facets-mobile:empty { display: none; }
+  .bb-shop-grid__aside .product-count {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin: 14px 0 0;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--bbc-line);
+    text-align: left;
+  }
+  .bb-shop-grid__aside .product-count__text {
+    font: 500 13px/1.2 var(--bbc-sans);
+    color: var(--bbc-muted);
+  }
+  #ProductGridContainer {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    min-width: 0;
+    margin-top: 20px;
+  }
+
+  /* same pill for both controls */
+  .bb-shop-grid__aside .mobile-facets__disclosure,
+  .bb-shop-grid__aside .mobile-facets__open-wrapper {
+    display: block;
+    width: 100%;
+  }
+  .bb-shop-grid__aside .mobile-facets__open,
+  .bb-shop-grid__sort-select {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    height: 42px;
+    border: 1px solid var(--bbc-line);
+    border-radius: var(--bbc-pill);
+    background-color: #fff;
+    font: 500 13px/1 var(--bbc-sans);
+    color: var(--bbc-ink);
+  }
+  .bb-shop-grid__aside .mobile-facets__open {
+    justify-content: center;
+    gap: 8px;
+    padding: 0 14px;
+  }
+  .bb-shop-grid__aside .mobile-facets__open .svg-wrapper {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+  }
+  .bb-shop-grid__aside .mobile-facets__open-label {
+    font: inherit;
+    text-decoration: none !important;
+  }
+  .bb-shop-grid__toolbar form { display: block; }
+  .bb-shop-grid__count { display: none; }
+  .bb-shop-grid__sort {
+    display: block;
+    width: 100%;
+  }
+  .bb-shop-grid__sort label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .bb-shop-grid__sort-select {
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0 30px 0 14px;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%232E2743' stroke-width='1.6'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+    background-size: 11px 7px;
+  }
+
+  /* compact card body on phones */
+  .bb-pcard__body {
+    padding: 12px 12px 14px;
+    gap: 4px;
+  }
+  .bb-pcard__title { font-size: 14px; }
+  /* one line of price so sale cards aren't taller; the "Sale" badge on
+     the photo already flags the discount */
+  .bb-pcard__price { flex-wrap: nowrap; gap: 6px; white-space: nowrap; }
+  .bb-pcard__price-now { font-size: 13.5px; }
+  .bb-pcard__price-old { font-size: 11px; }
+  .bb-pcard__price-off { display: none; }
+  .bb-pcard__add {
+    box-sizing: border-box;
+    padding: 10px 6px;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

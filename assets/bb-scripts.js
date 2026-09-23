@@ -160,6 +160,23 @@
     else mq.addListener(apply);
   }
 
+  /* ---- product card: dots follow the touch swipe between the 2 photos ---
+     One delegated capture listener, so cards injected later (filters,
+     pagination, theme editor) work without re-init. */
+  function initCardSwipe() {
+    if (window.__bbCardSwipe) return;
+    window.__bbCardSwipe = true;
+    document.addEventListener('scroll', function (e) {
+      var el = e.target;
+      if (!el.classList || !el.classList.contains('bb-pcard__slides')) return;
+      var dots = el.parentNode.querySelectorAll('.bb-pcard__dots i');
+      if (!dots.length || !el.clientWidth) return;
+      var idx = Math.round(el.scrollLeft / el.clientWidth);
+      for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('is-active', i === idx);
+    }, { capture: true, passive: true });
+  }
+  initCardSwipe();
+
   function ready(fn) {
     if (document.readyState !== 'loading') fn();
     else document.addEventListener('DOMContentLoaded', fn);
