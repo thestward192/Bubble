@@ -226,7 +226,35 @@
             {%- assign bb_url = 'bb_nav_' | append: i | append: '_url' -%}
             {%- if section.settings[bb_lbl] != blank -%}
               {%- assign bb_href = section.settings[bb_url] | default: routes.root_url -%}
-              <li><a class="bb-mainnav__link" href="{{ bb_href }}">{{ section.settings[bb_lbl] }}</a></li>
+              {%- assign bb_is_coll = false -%}
+              {%- if section.settings.bb_collections_menu -%}
+                {%- if bb_href == routes.all_products_collection_url or bb_href == routes.collections_url -%}
+                  {%- assign bb_is_coll = true -%}
+                {%- endif -%}
+              {%- endif -%}
+              {%- if bb_is_coll -%}
+                {%- comment -%} Collections dropdown: opens on hover / keyboard focus and lists every collection automatically {%- endcomment -%}
+                <li class="bb-mainnav__item--dd">
+                  <a class="bb-mainnav__link" href="{{ bb_href }}" aria-haspopup="true">
+                    {{ section.settings[bb_lbl] }}
+                    <svg class="bb-mainnav__caret" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                  </a>
+                  <div class="bb-mainnav__dd">
+                    <ul class="bb-mainnav__ddlist" role="list">
+                      <li><a class="bb-mainnav__ddlink bb-mainnav__ddlink--all" href="{{ routes.all_products_collection_url }}">{{ section.settings.bb_collections_shop_all | default: 'Shop all' }}</a></li>
+                      {%- for c in collections -%}
+                        {%- if c.handle == 'all' or c.handle == 'frontpage' or c.all_products_count == 0 -%}
+                          {%- continue -%}
+                        {%- endif -%}
+                        <li><a class="bb-mainnav__ddlink{% if request.page_type == 'collection' and collection.handle == c.handle %} is-current{% endif %}" href="{{ c.url }}"{% if request.page_type == 'collection' and collection.handle == c.handle %} aria-current="page"{% endif %}>{{ c.title | escape }}</a></li>
+                      {%- endfor -%}
+                      <li class="bb-mainnav__ddsep"><a class="bb-mainnav__ddlink bb-mainnav__ddlink--all" href="{{ routes.collections_url }}">{{ section.settings.bb_collections_view_all | default: 'View all collections' }}</a></li>
+                    </ul>
+                  </div>
+                </li>
+              {%- else -%}
+                <li><a class="bb-mainnav__link" href="{{ bb_href }}">{{ section.settings[bb_lbl] }}</a></li>
+              {%- endif -%}
             {%- endif -%}
           {%- endfor -%}
         </ul>
@@ -556,6 +584,14 @@
     { "type": "url", "id": "bb_nav_4_url", "label": "Link 4 URL" },
     { "type": "text", "id": "bb_nav_5_label", "label": "Link 5 text (optional)" },
     { "type": "url", "id": "bb_nav_5_url", "label": "Link 5 URL" },
+    {
+      "type": "header",
+      "content": "Collections dropdown"
+    },
+    { "type": "checkbox", "id": "bb_collections_menu", "label": "Show all collections in a dropdown", "info": "Lists every collection that has products, automatically. Desktop: added to the link above that points to /collections/all (or /collections). Mobile: replaces the menu's link to /collections/all (or /collections), or is added as the 2nd item.", "default": true },
+    { "type": "text", "id": "bb_collections_label", "label": "Dropdown name", "default": "Products" },
+    { "type": "text", "id": "bb_collections_shop_all", "label": "\"All products\" link text", "default": "Shop all" },
+    { "type": "text", "id": "bb_collections_view_all", "label": "\"All collections\" link text", "default": "View all collections" },
     {
       "type": "select",
       "id": "logo_position",

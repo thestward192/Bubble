@@ -1,0 +1,89 @@
+{% doc %}
+  Mobile drawer submenu that lists every collection in the store automatically,
+  so new collections show up without editing the navigation in the admin.
+  Uses the same markup as the drawer's built-in submenus so global.js opens/closes it.
+
+  @param {string} label - Text of the top-level item (e.g. "Products").
+  @param {number} index - Unique index for the details element id.
+
+  @example
+  {% render 'bb-drawer-collections', label: 'Products', index: 2 %}
+{% enddoc %}
+
+{%- liquid
+  assign bb_shop_all_label = section.settings.bb_collections_shop_all | default: 'Shop all'
+  assign bb_view_all_label = section.settings.bb_collections_view_all | default: 'View all collections'
+  assign bb_active = false
+  if request.page_type == 'collection' or request.page_type == 'list-collections'
+    assign bb_active = true
+  endif
+-%}
+
+<details id="Details-menu-drawer-menu-item-{{ index }}">
+  <summary
+    id="HeaderDrawer-bb-collections"
+    class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if bb_active %} menu-drawer__menu-item--active{% endif %}"
+  >
+    {{ label | escape }}
+    <span class="svg-wrapper">
+      {{- 'icon-arrow.svg' | inline_asset_content -}}
+    </span>
+    <span class="svg-wrapper">
+      {{- 'icon-caret.svg' | inline_asset_content -}}
+    </span>
+  </summary>
+  <div id="link-bb-collections" class="menu-drawer__submenu has-submenu gradient motion-reduce" tabindex="-1">
+    <div class="menu-drawer__inner-submenu">
+      <button class="menu-drawer__close-button link link--text focus-inset" aria-expanded="true">
+        <span class="svg-wrapper">
+          {{- 'icon-arrow.svg' | inline_asset_content -}}
+        </span>
+        {{ label | escape }}
+      </button>
+      <ul class="menu-drawer__menu list-menu" role="list" tabindex="-1">
+        <li>
+          <a
+            href="{{ routes.all_products_collection_url }}"
+            class="menu-drawer__menu-item link link--text list-menu__item focus-inset bb-drawer-coll__all{% if collection.handle == 'all' %} menu-drawer__menu-item--active{% endif %}"
+            {% if collection.handle == 'all' %}
+              aria-current="page"
+            {% endif %}
+          >
+            {{ bb_shop_all_label | escape }}
+          </a>
+        </li>
+        {%- for c in collections -%}
+          {%- if c.handle == 'all' or c.handle == 'frontpage' or c.all_products_count == 0 -%}
+            {%- continue -%}
+          {%- endif -%}
+          {%- assign bb_current = false -%}
+          {%- if request.page_type == 'collection' and collection.handle == c.handle -%}
+            {%- assign bb_current = true -%}
+          {%- endif -%}
+          <li>
+            <a
+              href="{{ c.url }}"
+              class="menu-drawer__menu-item link link--text list-menu__item focus-inset{% if bb_current %} menu-drawer__menu-item--active{% endif %}"
+              {% if bb_current %}
+                aria-current="page"
+              {% endif %}
+            >
+              {{ c.title | escape }}
+            </a>
+          </li>
+        {%- endfor -%}
+        <li>
+          <a
+            href="{{ routes.collections_url }}"
+            class="menu-drawer__menu-item link link--text list-menu__item focus-inset bb-drawer-coll__all{% if request.page_type == 'list-collections' %} menu-drawer__menu-item--active{% endif %}"
+            {% if request.page_type == 'list-collections' %}
+              aria-current="page"
+            {% endif %}
+          >
+            {{ bb_view_all_label | escape }}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</details>
